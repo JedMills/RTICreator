@@ -2,6 +2,7 @@ package main;
 
 import initialScene.InitialLayout;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
@@ -22,7 +23,7 @@ public class Main extends Application {
     public static Alert inputAlert;
     public static FileChooser fileChooser;
     public static DirectoryChooser directoryChooser;
-
+    public static Alert fileReadingAlert;
 
 
 
@@ -61,6 +62,9 @@ public class Main extends Application {
         inputAlert = new Alert(Alert.AlertType.INFORMATION);
         fileChooser = new FileChooser();
         directoryChooser = new DirectoryChooser();
+
+        fileReadingAlert = new Alert(Alert.AlertType.ERROR);
+        fileReadingAlert.setTitle("Error reading files");
     }
 
 
@@ -81,5 +85,17 @@ public class Main extends Application {
 
     public static void changeToNewProjLayout(){
         setCreatorStage(NewProjectLayout.getInstance());
+    }
+
+
+    public static void showFileReadingAlert(String contextText){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                fileReadingAlert.setContentText(contextText);
+                fileReadingAlert.showAndWait();
+            }
+        });
+
     }
 }

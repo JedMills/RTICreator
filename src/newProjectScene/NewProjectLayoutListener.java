@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import main.Main;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 
 /**
@@ -13,6 +14,7 @@ import java.io.File;
  */
 public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
 
+    private NewProjectLayout newProjectLayout;
 
     private static NewProjectLayoutListener ourInstance = new NewProjectLayoutListener();
 
@@ -21,6 +23,11 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
     }
 
     private NewProjectLayoutListener() {
+    }
+
+
+    public void init(NewProjectLayout newProjectLayout){
+        this.newProjectLayout = newProjectLayout;
     }
 
 
@@ -33,6 +40,17 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 Main.directoryChooser.setTitle("Choose project directory");
 
                 File directory = Main.directoryChooser.showDialog(Main.primaryStage);
+
+                if(directory != null){
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            newProjectLayout.loadImageDirectory(directory);
+                        }
+                    }).start();
+
+
+                }
             }
         }
     }

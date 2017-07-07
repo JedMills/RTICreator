@@ -1,12 +1,21 @@
 package newProjectScene;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import main.CreatorScene;
+import main.Main;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * Created by Jed on 06-Jul-17.
@@ -27,8 +36,8 @@ public class NewProjectLayout extends HBox implements CreatorScene{
     private Button nextBtn;
 
     private VBox toolbarLayout;
-    private VBox selectedImages;
-    private VBox rejectedImages;
+    private ScrollableImageGrid selectedImages;
+    private ScrollableImageGrid rejectedImages;
 
     private static NewProjectLayout ourInstance = new NewProjectLayout();
 
@@ -41,11 +50,13 @@ public class NewProjectLayout extends HBox implements CreatorScene{
         selectedImages = createSelectedImagesView();
         rejectedImages = createRejectedImagesView();
 
-        setHgrow(toolbarLayout, Priority.NEVER);
+        setHgrow(toolbarLayout, Priority.SOMETIMES);
         setHgrow(selectedImages, Priority.ALWAYS);
         setHgrow(rejectedImages, Priority.ALWAYS);
         getChildren().addAll(toolbarLayout, selectedImages, rejectedImages);
         getStylesheets().add("stylesheets/newProjectScene.css");
+
+        NewProjectLayoutListener.getInstance().init(this);
     }
 
 
@@ -114,25 +125,91 @@ public class NewProjectLayout extends HBox implements CreatorScene{
     }
 
 
-    private VBox createSelectedImagesView(){
-        VBox imageGrid  = new ScrollableImageGrid("Selected Images");
+    private ScrollableImageGrid createSelectedImagesView(){
+        ScrollableImageGrid imageGrid  = new ScrollableImageGrid("Selected Images", false, true);
         imageGrid.setPadding(new Insets(5, 5, 5, 5));
         imageGrid.setMaxHeight(Double.MAX_VALUE);
         imageGrid.setMaxWidth(Double.MAX_VALUE);
+        imageGrid.setMinWidth(250);
 
 
         return imageGrid;
     }
 
 
-    private VBox createRejectedImagesView(){
-        VBox imageGrid  = new ScrollableImageGrid("Rejected Images");
+    private ScrollableImageGrid createRejectedImagesView(){
+        ScrollableImageGrid imageGrid  = new ScrollableImageGrid("Rejected Images", false, true);
         imageGrid.setPadding(new Insets(5, 5, 5, 5));
         imageGrid.setMaxHeight(Double.MAX_VALUE);
         imageGrid.setMaxWidth(Double.MAX_VALUE);
+        imageGrid.setMinWidth(250);
 
         return imageGrid;
     }
+
+
+
+    public void loadImageDirectory(File directory){
+        File[] images = directory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if(name.endsWith(".jpg")){
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
+        if(images.length == 0){
+            Main.showFileReadingAlert("There are no images in the chosen directory.");
+            return;
+        }
+
+
+
+        Image[] imagesInDir = new Image[images.length];
+        String[] imageLocations = new String[images.length];
+        String[] imageNames = new String[images.length];
+
+        try {
+            Image firstImg = new Image("file:" + images[0].getAbsolutePath());
+            imagesInDir[0] = firstImg;
+            imageLocations[0] = images[0].getAbsolutePath();
+            imageNames[0] = images[0].getName();
+
+            double imageHeight = firstImg.getHeight();
+            double imageWidth = firstImg.getWidth();
+
+            for(int i = 1; i < imagesInDir.length; i++){
+                Image currentImg = new Image("file:" + images[i].getAbsolutePath());
+
+                if(currentImg.getWidth() != imageWidth || currentImg.getHeight() != imageHeight){
+                    Main.showFileReadingAlert("The width and height of all images in the directory do not match.");
+                    return;
+                }
+
+                imagesInDir[i] = currentImg;
+                imageLocations[i] = images[i].getAbsolutePath();
+                imageNames[i] = images[i].getName();
+            }
+
+            loadImagesIntoPreview(imagesInDir, imageLocations, imageNames);
+
+        }catch(Exception e){
+            e.printStackTrace();
+            Main.showFileReadingAlert("There was an error reading files in the chosen directory.");
+        }
+    }
+
+
+
+    private void loadImagesIntoPreview(Image[] images, String[] imagePaths, String[] imageNames){
+        for(int i = 0; i < images.length; i++){
+            selectedImages.addImageTile(imageNames[i], images[i], 150, 150);
+        }
+    }
+
 
 
 
