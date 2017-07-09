@@ -1,12 +1,11 @@
 package newProjectScene;
 
+import guiComponents.ImageGridTile;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import main.Main;
-
-import java.io.File;
-import java.io.FilenameFilter;
+import main.ProjectType;
+import utils.Utils;
 
 
 /**
@@ -18,9 +17,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
 
     private static NewProjectLayoutListener ourInstance = new NewProjectLayoutListener();
 
-    public static NewProjectLayoutListener getInstance() {
-        return ourInstance;
-    }
+    public static NewProjectLayoutListener getInstance() {return ourInstance;}
 
     private NewProjectLayoutListener() {
     }
@@ -37,20 +34,32 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
             Button source = (Button) event.getSource();
 
             if(source.getId().equals("openFolder")){
-                Main.directoryChooser.setTitle("Choose project directory");
-
-                File directory = Main.directoryChooser.showDialog(Main.primaryStage);
-
-                if(directory != null){
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            newProjectLayout.loadImageDirectory(directory);
-                        }
-                    }).start();
-
-
+                if(Utils.checkIn(newProjectLayout.getProjectType(),
+                        new ProjectType[]{ProjectType.HIGHLIGHT_HSH, ProjectType.HIGHLIGHT_PTM})){
+                    LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.HIGHLIGHT);
+                }else{
+                    LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.LP);
                 }
+
+            }else if(source.getId().equals("addPropertyButton")){
+                AddPropertyDialog.getInstance().show();
+
+            }else if(source.getId().equals("delPropertyButton")){
+                newProjectLayout.deleteSelectedProperty();
+
+            }else if(source.getId().equals("removePicButton")){
+                System.out.println("Response called");
+                String comment = newProjectLayout.getRemoveRsnTxtField().getText();
+                ImageGridTile tile = newProjectLayout.removeGridTileSelected();
+                if(tile != null) {
+                    tile.setRejectComment(comment);
+                    tile.setSelected(false);
+                    newProjectLayout.addTileToRejected(tile);
+                }
+
+            }else if(source.getId().equals("replacePicButton")){
+
+
             }
         }
     }

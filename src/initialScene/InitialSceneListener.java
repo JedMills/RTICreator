@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import main.Main;
 import main.ProjectType;
+import main.RTIProject;
 
 import java.io.File;
 
@@ -37,7 +38,9 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
             if(source.getId().equals("startNewProject")){
                 if(checkInputs()){
-                    Main.changeToNewProjLayout();
+                    RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(),
+                                                                initialLayout.getProjectOptions().getSelectionModel().getSelectedItem());
+                    Main.changeToNewProjLayout(createdProject);
                 }
             }else if(source.getId().equals("openExistingProject")){
                 Main.directoryChooser.setTitle("Open existing project");
