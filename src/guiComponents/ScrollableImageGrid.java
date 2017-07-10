@@ -92,6 +92,7 @@ public class ScrollableImageGrid extends BorderPane {
             @Override
             public void run() {
                 tilePane.getChildren().clear();
+                selectedTile = null;
             }
         });
     }
@@ -116,4 +117,5 @@ public class ScrollableImageGrid extends BorderPane {
         tilePane.getChildren().remove(selectedTile);
         selectedTile = null;
     }
+
 }

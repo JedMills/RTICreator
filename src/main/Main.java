@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
@@ -34,15 +35,21 @@ public class Main extends Application {
 
     private static RTIProject currentRTIProjct;
 
+    private static Scene initialScene;
+    private static Scene newProjScene;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Main.primaryStage = primaryStage;
         primaryStage.setTitle("RTI Creator");
+        Image thumbnail = new Image("images/rtiThumbnail.png");
+        primaryStage.getIcons().add(thumbnail);
 
         setupDialogs();
+        createScenes();
 
-        setCreatorStage(InitialLayout.getInstance());
+        setCreatorStage(initialScene, InitialLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -66,6 +73,13 @@ public class Main extends Application {
     }
 
 
+    private void createScenes(){
+        initialScene = new Scene(InitialLayout.getInstance());
+        newProjScene = new Scene(NewProjectLayout.getInstance());
+    }
+
+
+
     private static void setupDialogs(){
         inputAlert = new Alert(Alert.AlertType.INFORMATION);
         inputAlert.setTitle("Invalid Input");
@@ -83,8 +97,7 @@ public class Main extends Application {
 
 
 
-    private static void setCreatorStage(Parent layout){
-        Scene scene = new Scene(layout);
+    private static void setCreatorStage(Scene scene, Parent layout){
         primaryStage.setScene(scene);
 
         CreatorScene creatorScene = (CreatorScene) layout;
@@ -100,7 +113,11 @@ public class Main extends Application {
     public static void changeToNewProjLayout(RTIProject rtiProject){
         currentRTIProjct = rtiProject;
         NewProjectLayout.getInstance().setProject(rtiProject);
-        setCreatorStage(NewProjectLayout.getInstance());
+        setCreatorStage(newProjScene, NewProjectLayout.getInstance());
+    }
+
+    public static void changeToInitialLayout(){
+        setCreatorStage(initialScene, InitialLayout.getInstance());
     }
 
 

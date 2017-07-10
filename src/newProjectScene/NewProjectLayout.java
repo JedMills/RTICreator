@@ -3,8 +3,6 @@ package newProjectScene;
 import guiComponents.ImageGridTile;
 import guiComponents.ScrollableImageGrid;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -21,6 +19,8 @@ import utils.Utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Created by Jed on 06-Jul-17.
@@ -181,17 +181,26 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     private VBox createRemovePicPane(){
         VBox removePicPane = new VBox();
-        removeRsnTxtField = new TextArea();
-        removePicBtn = new Button("Remove picture >>");
-        removePicBtn.setId("removePicButton");
-        removePicBtn.setOnAction(NewProjectLayoutListener.getInstance());
 
-        replaceBtn = new Button("<< Replace picture");
-        replaceBtn.setId("replacePibBtn");
-        replaceBtn.setOnAction(NewProjectLayoutListener.getInstance());
+            VBox insidePane = new VBox();
+            insidePane.setId("removePicPane");
+            Label removeLabel = new Label("Remove Photos");
+            removeLabel.setFont(Font.font(null, FontWeight.BOLD, 12));
 
-        removePicPane.getChildren().addAll(removeRsnTxtField, removePicBtn, replaceBtn);
-        removePicPane.setSpacing(5);
+            removeRsnTxtField = new TextArea();
+            removePicBtn = new Button("Remove picture >>");
+            removePicBtn.setId("removePicButton");
+            removePicBtn.setOnAction(NewProjectLayoutListener.getInstance());
+
+            replaceBtn = new Button("<< Replace picture");
+            replaceBtn.setId("replacePicBtn");
+            replaceBtn.setOnAction(NewProjectLayoutListener.getInstance());
+
+            insidePane.getChildren().addAll(removeLabel, removeRsnTxtField, removePicBtn, replaceBtn);
+            insidePane.setSpacing(5);
+            insidePane.setPadding(new Insets(5, 5, 5, 5));
+            insidePane.setAlignment(Pos.CENTER);
+        removePicPane.getChildren().add(insidePane);
         removePicPane.setPadding(new Insets(5, 5, 5, 5));
         removePicPane.setAlignment(Pos.CENTER);
         removePicPane.setMaxWidth(180);
@@ -206,9 +215,13 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     private HBox createNextBackBox(){
         HBox hBox = new HBox();
         backBtn = new Button("< Back");
+        backBtn.setId("backBtn");
+        backBtn.setOnAction(NewProjectLayoutListener.getInstance());
         backBtn.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
 
         nextBtn = new Button("Next >");
+        nextBtn.setId("nextBtn");
+        nextBtn.setOnAction(NewProjectLayoutListener.getInstance());
         nextBtn.setMaxSize(Button.USE_PREF_SIZE, Button.USE_PREF_SIZE);
 
         Pane spacer = new Pane();
@@ -424,12 +437,38 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     }
 
+
+
+
     public void setResources(String imgsLocation, String lpLocation, String outLocation){
-        System.out.println("LP file project:");
-        System.out.println(imgsLocation);
-        System.out.println(lpLocation);
-        System.out.println(outLocation);
+        File imgsFolder = new File(imgsLocation);
+        File lpFile = new File(lpLocation);
+        File outFolder = new File(outLocation);
+
+        this.lpFile = lpFile;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HashMap<String, Utils.Vector3f> lpData = Utils.readLPFile(lpFile);
+                    System.out.println(imgsLocation + ", " + outLocation);
+                    setResources(imgsLocation, outLocation);
+                }catch(IOException e){
+                    Main.showFileReadingAlert("Error accessing LP file at: " + lpLocation);
+                }catch(Utils.LPException e){
+                    Main.showFileReadingAlert("Error parsing LP file at: " + lpLocation +
+                                                                                ", " + e.getMessage());
+                }
+            }
+        }).start();
+
     }
+
+
+
+
+
 
 
     public ProjectType getProjectType(){
@@ -481,6 +520,28 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
     public void addTileToRejected(ImageGridTile tile){
+        tile.setParent(rejectedImages);
         rejectedImages.addImageTile(tile);
     }
+
+
+    public ImageGridTile removeGridTileRejected(){
+        ImageGridTile tile = rejectedImages.getSelectedTile();
+        rejectedImages.removeSelectedTile();
+        return tile;
+    }
+
+    public void addTileToSelected(ImageGridTile tile){
+        tile.setParent(selectedImages);
+        selectedImages.addImageTile(tile);
+    }
+
+
+    public void resetScene(){
+        projectPropertyTableView.getItems().clear();
+        selectedImages.clearTiles();
+        rejectedImages.clearTiles();
+        removeRsnTxtField.setText("");
+    }
+
 }

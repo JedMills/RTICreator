@@ -2,6 +2,12 @@ package utils;
 
 import main.ProjectType;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+
 /**
  * Created by Jed on 09-Jul-17.
  */
@@ -27,5 +33,184 @@ public class Utils {
         return false;
     }
 
+
+    public static class LPException extends Exception{
+        public LPException(String message) {
+            super(message);
+        }
+    }
+
+
+    public static HashMap<String, Vector3f> readLPFile(File lpFile) throws IOException, LPException{
+        if(lpFile.isDirectory()){throw new RuntimeException("LP file is directory.");}
+        if(!lpFile.getName().endsWith(".lp")){throw new RuntimeException("LP file does not end with '.lp'.");}
+
+        BufferedReader reader = new BufferedReader(new FileReader(lpFile));
+        String line = reader.readLine();
+        int currentLine = 1;
+
+
+        int numImages;
+        try{
+            numImages = Integer.parseInt(line);
+        }catch(NumberFormatException e){
+            throw new LPException("File did not contain number of images on line 1.");
+        }
+
+
+
+        HashMap<String, Vector3f> lpData = new HashMap<>();
+        int numLPData = 0;
+        line = reader.readLine();
+        currentLine ++;
+
+        String[] lineItems;
+        String fileName;
+        float lightX, lightY, lightZ;
+        while(numLPData < numImages){
+            while(line.equals("")){
+                currentLine ++;
+                line = reader.readLine();
+            }
+
+
+            lineItems = line.split("\\s+");
+
+
+            try{
+                fileName = lineItems[0];
+                lightX = Float.parseFloat(lineItems[1]);
+                lightY = Float.parseFloat(lineItems[2]);
+                lightZ = Float.parseFloat(lineItems[3]);
+            }catch(NumberFormatException|IndexOutOfBoundsException e){
+                throw new LPException("Error parsing lp data on line: " + currentLine);
+            }
+
+            lpData.put(fileName, new Vector3f(lightX, lightY, lightZ));
+            numLPData ++;
+
+            line = reader.readLine();
+            currentLine ++;
+
+            if(line == null){break;}
+        }
+
+        reader.close();
+        return lpData;
+    }
+
+
+
+
+
+
+
+    /**
+     * All the 3D vectors needed in this program are from here!
+     *
+     * Created by jed on 16/05/17.
+     */
+    public static class Vector3f{
+        /**The x component*/
+        public float x;
+        /**The y component*/
+        public float y;
+        /**The z component*/
+        public float z;
+
+        /**
+         *
+         * @param x     for the x component of the vector
+         * @param y     for the y component of the vector
+         * @param z     for the z component of the vector
+         */
+        public Vector3f(float x, float y, float z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        /**
+         * @return x component of the vector
+         */
+        public float getX() {
+            return x;
+        }
+
+        /**
+         * @param x set the x component of the vector
+         */
+        public void setX(float x) {
+            this.x = x;
+        }
+
+        /**
+         * @return y component of the vector
+         */
+        public float getY() {
+            return y;
+        }
+
+        /**
+         * @param y set the y component of the vector
+         */
+        public void setY(float y) {
+            this.y = y;
+        }
+
+        /**
+         * @return z component of the vector
+         */
+        public float getZ() {
+            return z;
+        }
+
+        /**
+         * @param z set the z component of the vector
+         */
+        public void setZ(float z) {
+            this.z = z;
+        }
+
+        /**
+         * @return  a new vector with normalised lengths
+         */
+        public Vector3f normalise(){
+            Vector3f v = new Vector3f(0f, 0f, 0f);
+            float length = (float) Math.sqrt(x*x + y*y + z*z);
+            if(length != 0){
+                v.x = x / length;
+                v.y = y / length;
+                v.z = z / length;
+            }
+            return v;
+        }
+
+        public float get(int i){
+            if(i == 0){return x;}
+            else if(i == 1){return y;}
+            else if(i == 2){return z;}
+
+            return 0;
+        }
+
+        public float dot(Vector3f v){
+            return (x * v.x) + (y * v.y) + (z * v.z);
+        }
+
+        public Vector3f multiply(float a){
+            return new Vector3f(this.x * a, this.y * a, this.z * a);
+        }
+
+        public float length(){return (float) Math.pow(x*x + y*y + z*z, 0.5);}
+
+        public Vector3f add(Vector3f vec){
+            return new Vector3f(x + vec.x, y + vec.y, z + vec.z);
+        }
+
+        public Vector3f minus(Vector3f vec){
+            return new Vector3f(x - vec.x, y - vec.y, z - vec.z);
+        }
+    }
 
 }

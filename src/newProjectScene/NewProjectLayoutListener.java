@@ -4,6 +4,7 @@ import guiComponents.ImageGridTile;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import main.Main;
 import main.ProjectType;
 import utils.Utils;
 
@@ -48,19 +49,32 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 newProjectLayout.deleteSelectedProperty();
 
             }else if(source.getId().equals("removePicButton")){
-                System.out.println("Response called");
                 String comment = newProjectLayout.getRemoveRsnTxtField().getText();
                 ImageGridTile tile = newProjectLayout.removeGridTileSelected();
                 if(tile != null) {
+                    newProjectLayout.getRemoveRsnTxtField().setText("");
                     tile.setRejectComment(comment);
                     tile.setSelected(false);
                     newProjectLayout.addTileToRejected(tile);
                 }
 
-            }else if(source.getId().equals("replacePicButton")){
+            }else if(source.getId().equals("replacePicBtn")){
+                ImageGridTile tile = newProjectLayout.removeGridTileRejected();
+                if(tile != null){
+                    tile.removeRejectComment();
+                    tile.setSelected(false);
+                    newProjectLayout.addTileToSelected(tile);
+                }
 
+            }else if(source.getId().equals("backBtn")){
+                Main.changeToInitialLayout();
+                newProjectLayout.resetScene();
+
+            }else if(source.getId().equals("nextBtn")){
 
             }
         }
     }
+
+
 }

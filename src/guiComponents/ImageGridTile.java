@@ -17,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 /**
@@ -31,8 +32,8 @@ public class ImageGridTile extends VBox {
     private boolean clickable;
     private BorderPane borderPane;
     private ScrollableImageGrid parent;
-    private boolean preview;
     private String rejectComment;
+    private Tooltip tooltip;
 
     private static PseudoClass TILE_SELECTED_CLASS = PseudoClass.getPseudoClass("selected");
 
@@ -54,6 +55,8 @@ public class ImageGridTile extends VBox {
         }
     };
 
+
+
     public ImageGridTile(ScrollableImageGrid parent, String name, Image image, int width,
                                             int height, boolean tickBox, boolean clickable, boolean preview){
         this.parent = parent;
@@ -62,7 +65,9 @@ public class ImageGridTile extends VBox {
         this.height = height;
         this.tickBox = tickBox;
         this.clickable = clickable;
-        this.preview = preview;
+
+        tooltip = new Tooltip();
+        tooltip.setTextAlignment(TextAlignment.JUSTIFY);
 
         createLayout(image);
         getStyleClass().add("imageGridTile");
@@ -154,6 +159,15 @@ public class ImageGridTile extends VBox {
 
     public void setRejectComment(String comment){
         rejectComment = comment;
-        Tooltip.install(this, new Tooltip("Reject reason: " + comment));
+        tooltip.setText("Reject reason: " + comment);
+        Tooltip.install(this, tooltip);
+    }
+
+    public void removeRejectComment(){
+        Tooltip.uninstall(this, tooltip);
+    }
+
+    public void setParent(ScrollableImageGrid parent){
+        this.parent = parent;
     }
 }

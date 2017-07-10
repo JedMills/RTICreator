@@ -309,7 +309,7 @@ public class LoadProjRsrcsDialog {
                         newProjectLayout.setResources(imgLocationFieldHL.getText(), outLocationFieldHL.getText());
                     }else if(fields.length == 3){
                         newProjectLayout.setResources(imgLocationFieldLP.getText(),
-                                lpLocationField.getText(), outLocationFieldHL.getText());
+                                lpLocationField.getText(), outLocationFieldLP.getText());
                     }
                 }
                 stage.close();
