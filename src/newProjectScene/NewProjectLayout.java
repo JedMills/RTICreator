@@ -20,6 +20,7 @@ import utils.Utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -60,10 +61,13 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     private RTIProject rtiProject;
 
+    private HashMap<String, Utils.Vector3f> lpData;
+
+    private boolean resourcesSet = false;
 
     private NewProjectLayout() {
         createLayout();
-        getStylesheets().add("stylesheets/newProjectScene.css");
+        getStylesheets().add("stylesheets/default.css");
         NewProjectLayoutListener.getInstance().init(this);
         LoadProjRsrcsDialog.getInstance().init(this);
         AddPropertyDialog.getInstance().init(this);
@@ -88,9 +92,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         HBox.setMargin(rejectedImages, new Insets(5, 5, 5,5 ));
 
         nextBackBox = createNextBackBox();
-
-        setMargin(mainLayout, new Insets(5, 5, 5, 5));
-        setMargin(nextBackBox, new Insets(5, 5, 5, 5));
     }
 
 
@@ -274,7 +275,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             File[] images = directory.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    if(name.endsWith(".jpg")){
+                    if(name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png")){
                         return true;
                     }
                     return false;
@@ -292,33 +293,43 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             String[] imageLocations = new String[images.length];
             String[] imageNames = new String[images.length];
 
+            String format = "";
+            if(images[0].getName().toLowerCase().endsWith(".jpg")){format = "jpg";}
+            else if(images[0].getName().toLowerCase().endsWith(".png")){format = "png";}
 
-                Image firstImg = new Image("file:" + images[0].getAbsolutePath());
-                imagesInDir[0] = firstImg;
-                imageLocations[0] = images[0].getAbsolutePath();
-                imageNames[0] = images[0].getName();
+            Image firstImg = new Image("file:" + images[0].getAbsolutePath());
+            imagesInDir[0] = firstImg;
+            imageLocations[0] = images[0].getAbsolutePath();
+            imageNames[0] = images[0].getName();
 
-                double imageHeight = firstImg.getHeight();
-                double imageWidth = firstImg.getWidth();
+            double imageHeight = firstImg.getHeight();
+            double imageWidth = firstImg.getWidth();
 
-                for(int i = 1; i < imagesInDir.length; i++){
-                    Image currentImg = new Image("file:" + images[i].getAbsolutePath());
+            for(int i = 1; i < imagesInDir.length; i++){
+                Image currentImg = new Image("file:" + images[i].getAbsolutePath());
 
-                    if(currentImg.getWidth() != imageWidth || currentImg.getHeight() != imageHeight){
-                        Main.showFileReadingAlert("The width and height of all images in the directory do not match.");
-                        return;
-                    }
-
-                    imagesInDir[i] = currentImg;
-                    imageLocations[i] = images[i].getAbsolutePath();
-                    imageNames[i] = images[i].getName();
+                if(currentImg.getWidth() != imageWidth || currentImg.getHeight() != imageHeight){
+                    Main.showFileReadingAlert("The width and height of all images in the folder do not match.");
+                    return;
                 }
 
-                selectedImages.clearTiles();
-                rejectedImages.clearTiles();
-                resetPropertiesTable();
-                loadImagesIntoPreview(imagesInDir, imageNames);
-                addWidthHeightToTable(imageWidth, imageHeight);
+                String name = images[i].getName().toLowerCase();
+                if((name.endsWith(".png") && format.equals("jpg")) ||
+                        (name.endsWith(".jpg") && format.equals("png"))){
+                    Main.showFileReadingAlert("All images in folder must be of the same format.");
+                    return;
+                }
+
+                imagesInDir[i] = currentImg;
+                imageLocations[i] = images[i].getAbsolutePath();
+                imageNames[i] = images[i].getName();
+            }
+
+            selectedImages.clearTiles();
+            rejectedImages.clearTiles();
+            resetPropertiesTable();
+            loadImagesIntoPreview(imagesInDir, imageNames);
+            addWidthHeightToTable(imageWidth, imageHeight);
 
         }catch(Exception e){
             e.printStackTrace();
@@ -435,15 +446,14 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             }
         }).start();
 
+        resourcesSet = true;
     }
 
 
 
 
     public void setResources(String imgsLocation, String lpLocation, String outLocation){
-        File imgsFolder = new File(imgsLocation);
         File lpFile = new File(lpLocation);
-        File outFolder = new File(outLocation);
 
         this.lpFile = lpFile;
 
@@ -451,8 +461,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             @Override
             public void run() {
                 try {
-                    HashMap<String, Utils.Vector3f> lpData = Utils.readLPFile(lpFile);
-                    System.out.println(imgsLocation + ", " + outLocation);
+                    lpData = Utils.readLPFile(lpFile);
                     setResources(imgsLocation, outLocation);
                 }catch(IOException e){
                     Main.showFileReadingAlert("Error accessing LP file at: " + lpLocation);
@@ -542,6 +551,43 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         selectedImages.clearTiles();
         rejectedImages.clearTiles();
         removeRsnTxtField.setText("");
+    }
+
+    public HashMap<String, Utils.Vector3f> getLpData() {
+        return lpData;
+    }
+
+
+    public boolean isResourcesSet() {
+        return resourcesSet;
+    }
+
+
+    public File getImgsFolder() {
+        return imgsFolder;
+    }
+
+    public File getOutFolder() {
+        return outFolder;
+    }
+
+    public File getLpFile() {
+        return lpFile;
+    }
+
+    public Image[] getSelectedImages(){
+        return selectedImages.getAllImages();
+    }
+
+    public ArrayList<ImageGridTile> getSelectedImages(ArrayList<String> filter){
+        ArrayList<ImageGridTile> tiles = new ArrayList<>();
+
+        for(ImageGridTile tile : selectedImages.getGridTiles()){
+            if(Utils.checkIn(tile.getName(), filter)){
+                tiles.add(tile);
+            }
+        }
+        return tiles;
     }
 
 }

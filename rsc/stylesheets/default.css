@@ -1,4 +1,59 @@
-#initialLayoutGridPane, #initialLayoutHBox{
+#initialLayoutGridPane, #initialLayoutHBox, HBox, GridPane, .projectPropertiesPane,
+#openBtnBox, #removePicPane, #fitterPane, #cropExecLayoutCropOptions{
     -fx-border-color: #dddddd;
     -fx-border-radius: 5;
+}
+
+.titleBox{
+    -fx-border-radius: 0;
+    -fa-background-color: #cccccc;
+}
+
+.imageGridScrollPane{
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-focus-color: transparent;
+    -fx-accent: transparent;
+}
+
+TilePane{
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 0;
+    -fx-focus-color: transparent;
+    -fx-accent: transparent;
+}
+
+.scrollableImageGrid HBox{
+    -fx-background-color: -fx-body-color;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 0;
+}
+
+.imageGridTile{
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 2;
+    -fx-background-color: -fx-base;
+    -fx-background-radius: 2;
+    -fx-effect: dropshadow( gaussian , #D3D3D3, 10, 0, 0, 0);
+}
+
+.imageGridTile:hover{
+    -fx-background-color: #eeeeee;
+}
+
+.imageGridTile:selected{
+    -fx-color: -fx-base;
+    -fx-border-color: #039ed3;
+    -fx-effect: dropshadow( gaussian , #039ed3, 10, 0, 0, 0);
+}
+
+
+
+#cropExecutePanePreview BorderPane{
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 5;
+}
+
+#cropExecLayoutCropOptions HBox, #cropExecLayoutCropOptions GridPane{
+    -fx-border-color: transparent;
 }

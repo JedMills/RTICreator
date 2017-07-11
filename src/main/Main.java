@@ -1,10 +1,13 @@
 package main;
 
+import cropExecuteScene.CropExecuteLayout;
+import guiComponents.ImageGridTile;
 import initialScene.InitialLayout;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,6 +22,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import newProjectScene.NewProjectLayout;
+
+import java.util.ArrayList;
 
 /**
  * Created by Jed on 06-Jul-17.
@@ -37,6 +42,7 @@ public class Main extends Application {
 
     private static Scene initialScene;
     private static Scene newProjScene;
+    private static Scene cropExecuteScene;
 
 
     @Override
@@ -49,7 +55,8 @@ public class Main extends Application {
         setupDialogs();
         createScenes();
 
-        setCreatorStage(initialScene, InitialLayout.getInstance());
+        //setCreatorStage(initialScene, InitialLayout.getInstance());
+        setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -65,6 +72,15 @@ public class Main extends Application {
             }
         });
 
+
+        primaryStage.maximizedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                currentScene.updateSize(primaryStage.getWidth(), primaryStage.getHeight());
+            }
+        });
+
+
         primaryStage.show();
     }
 
@@ -76,6 +92,7 @@ public class Main extends Application {
     private void createScenes(){
         initialScene = new Scene(InitialLayout.getInstance());
         newProjScene = new Scene(NewProjectLayout.getInstance());
+        cropExecuteScene = new Scene(CropExecuteLayout.getInstance());
     }
 
 
@@ -119,6 +136,14 @@ public class Main extends Application {
     public static void changeToInitialLayout(){
         setCreatorStage(initialScene, InitialLayout.getInstance());
     }
+
+
+    public static void changeToCropExecuteScene(ArrayList<ImageGridTile> approvedTiles){
+        ArrayList<ImageGridTile> clones = (ArrayList<ImageGridTile>) approvedTiles.clone();
+        CropExecuteLayout.getInstance().setLPTiles(clones);
+        setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
+    }
+
 
 
     public static void showFileReadingAlert(String contextText){
@@ -186,7 +211,9 @@ public class Main extends Application {
             label.setId("loadingDialogLabel");
 
             vBox.getChildren().addAll(label, progIndicator);
-            scene = new Scene(vBox, 200, 150);
+            vBox.setPadding(new Insets(20, 20,20, 20));
+            vBox.setStyle("-fx-border-width: 2; -fx-border-color: #dddddd;");
+            scene = new Scene(vBox);
             stage.setScene(scene);
         }
 

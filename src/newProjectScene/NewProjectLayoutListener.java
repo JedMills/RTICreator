@@ -4,9 +4,13 @@ import guiComponents.ImageGridTile;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import main.Main;
 import main.ProjectType;
 import utils.Utils;
+
+import java.io.File;
+import java.util.ArrayList;
 
 
 /**
@@ -71,10 +75,71 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 newProjectLayout.resetScene();
 
             }else if(source.getId().equals("nextBtn")){
+                if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP_PTM)){
+                    moveSceneDomePTM();
 
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP_HSH)){
+                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
+
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT_PTM)){
+                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
+
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT_HSH)){
+                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
+
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP_PTM)){
+                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
+
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP_HSH)){
+                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
+
+                }
             }
         }
     }
 
+
+
+
+    private void moveSceneDomePTM(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Main.showLoadingDialog("Checking project resources...");
+
+                if(!newProjectLayout.isResourcesSet()){
+                    Main.hideLoadingDialog();
+                    Main.showInputAlert("Please open the resources for this project using the 'Open Project Resources' button.");
+                    return;
+                }
+
+
+                String imgFolderPath = newProjectLayout.getImgsFolder().getAbsolutePath();
+
+                String fileName;
+                ArrayList<String> fileNames = new ArrayList<>();
+                File currentFile;
+                for(String s : newProjectLayout.getLpData().keySet()){
+                    fileName = new File(s).getName();
+                    currentFile = new File(imgFolderPath + "/" + fileName);
+
+                    if(!currentFile.exists() || currentFile.isDirectory()){
+                        Main.hideLoadingDialog();
+                        Main.showFileReadingAlert("Not all of the images specified in the LP file were found in the " +
+                                "image resources file.");
+                        return;
+                    }
+
+                    fileNames.add(fileName);
+                }
+
+                ArrayList<ImageGridTile> selectedImages = newProjectLayout.getSelectedImages(fileNames);
+
+                Main.hideLoadingDialog();
+                Main.changeToCropExecuteScene(selectedImages);
+            }
+        }).run();
+
+    }
 
 }

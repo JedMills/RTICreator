@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -25,6 +26,15 @@ public class Utils {
 
 
     public static boolean checkIn(String string, String[] strings){
+        for(String s : strings) {
+            if (s.equals(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean checkIn(String string, ArrayList<String> strings){
         for(String s : strings) {
             if (s.equals(string)) {
                 return true;

@@ -31,6 +31,7 @@ public class ImageGridTile extends VBox {
     private boolean tickBox;
     private boolean clickable;
     private BorderPane borderPane;
+    private ImageView imageView;
     private ScrollableImageGrid parent;
     private String rejectComment;
     private Tooltip tooltip;
@@ -71,7 +72,7 @@ public class ImageGridTile extends VBox {
 
         createLayout(image);
         getStyleClass().add("imageGridTile");
-        getStylesheets().add("stylesheets/newProjectScene.css");
+        getStylesheets().add("stylesheets/default.css");
 
         if(preview){addPreviewListener(image);}
         if(clickable){addSelectableListener();}
@@ -85,14 +86,12 @@ public class ImageGridTile extends VBox {
         borderPane.setStyle("-fx-background-color: #000000;");
         borderPane.setPrefWidth(getPrefWidth());
         borderPane.setPrefHeight(getPrefHeight() - 20);
-            ImageView imageView = new ImageView(image);
+            imageView = new ImageView(image);
             imageView.setFitWidth(borderPane.getPrefWidth());
             imageView.setFitHeight(borderPane.getPrefHeight());
             imageView.setSmooth(true);
             imageView.setPreserveRatio(true);
         borderPane.setCenter(imageView);
-
-
 
         Label label = new Label(name);
         label.setPadding(new Insets(2, 2, 2, 2));
@@ -169,5 +168,11 @@ public class ImageGridTile extends VBox {
 
     public void setParent(ScrollableImageGrid parent){
         this.parent = parent;
+    }
+
+    public Image getImage(){return imageView.getImage();}
+
+    public String getName() {
+        return name;
     }
 }

@@ -29,7 +29,7 @@ public class ScrollableImageGrid extends BorderPane {
         this.preview = preview;
 
         createLayout(title);
-        getStylesheets().add("stylesheets/newProjectScene.css");
+        getStylesheets().add("stylesheets/default.css");
         getStyleClass().add("scrollableImageGrid");
     }
 
@@ -118,4 +118,29 @@ public class ScrollableImageGrid extends BorderPane {
         selectedTile = null;
     }
 
+    public Image[] getAllImages(){
+        Image[] images = new Image[tilePane.getChildren().size()];
+
+        int i = 0;
+        for(Node node : tilePane.getChildren()){
+            if(node instanceof ImageGridTile){
+                images[i] = ((ImageGridTile) node).getImage();
+                i ++;
+            }
+        }
+        return images;
+    }
+
+    public ImageGridTile[] getGridTiles(){
+        ImageGridTile[] tiles = new ImageGridTile[tilePane.getChildren().size()];
+        int i = 0;
+        for(Node node : tilePane.getChildren()){
+            if(node instanceof ImageGridTile){
+                tiles[i] = ((ImageGridTile) node);
+                i ++;
+            }
+        }
+        return tiles;
+
+    }
 }

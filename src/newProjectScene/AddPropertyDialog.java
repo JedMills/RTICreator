@@ -62,7 +62,7 @@ public class AddPropertyDialog {
         stage.setMinHeight(163);
         stage.setMaxHeight(163);
 
-        scene.getStylesheets().add("stylesheets/newProjectScene.css");
+        scene.getStylesheets().add("stylesheets/default.css");
 
         stage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override

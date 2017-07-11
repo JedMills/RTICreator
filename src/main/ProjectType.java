@@ -7,8 +7,8 @@ public enum ProjectType {
 
     HIGHLIGHT_HSH   ("Highlight based - PTM fitter"),
     HIGHLIGHT_PTM   ("Highlight based - HSH fitter"),
-    DOME_LP_HSH     ("Dome LP file - PTM fitter"),
-    DOME_LP_PTM     ("Dome LP file - HSH fitter"),
+    DOME_LP_HSH     ("Dome LP file - HSH fitter"),
+    DOME_LP_PTM     ("Dome LP file - PTM fitter"),
     LP_HSH          ("LP file - PTM fitter"),
     LP_PTM          ("LP file - HSH fitter");
 

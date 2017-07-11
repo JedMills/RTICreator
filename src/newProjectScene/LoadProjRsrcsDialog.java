@@ -72,9 +72,9 @@ public class LoadProjRsrcsDialog {
 
         initComponents();
         highlightLayout = new Scene(createHighlightLayout());
-        highlightLayout.getStylesheets().add("stylesheets/newProjectScene.css");
+        highlightLayout.getStylesheets().add("stylesheets/default.css");
         lpLayout = new Scene(createLPLayout());
-        lpLayout.getStylesheets().add("stylesheets/newProjectScene.css");
+        lpLayout.getStylesheets().add("stylesheets/default.css");
 
 
 
