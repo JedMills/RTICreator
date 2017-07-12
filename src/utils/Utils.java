@@ -1,5 +1,8 @@
 package utils;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import main.ProjectType;
 
 import java.io.BufferedReader;
@@ -42,6 +45,16 @@ public class Utils {
         }
         return false;
     }
+
+
+
+    public static Image cropImage(Image image, int x, int y, int width, int height){
+        PixelReader reader = image.getPixelReader();
+        WritableImage croppedImage = new WritableImage(reader, x, y, width, height);
+        return croppedImage;
+    }
+
+
 
 
     public static class LPException extends Exception{

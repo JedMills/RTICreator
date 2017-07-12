@@ -1,19 +1,12 @@
 package cropExecuteScene;
 
 import guiComponents.ImageGridTile;
-import guiComponents.ScrollableImageGrid;
 import guiComponents.ScrollableImageGridForCrop;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import main.CreatorScene;
@@ -34,14 +27,11 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private VBox cropPane;
     private VBox fitterInterfacePane;
 
-    private BorderPane imageBorderPane;
-    private ImageView imagePreview;
+    private ImageCropPane imageCropPane;
     private TextField cropWidthField;
     private TextField cropHeightField;
     private CheckBox useCropCheckBox;
-    private Button clearCropButton;
-    private Button cropColourButton;
-
+    private ComboBox<ImageCropPane.Colour> cropColourSelector;
 
 
     private TextField fitterLocationField;
@@ -49,15 +39,19 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private TextField outputLocationField;
     private Button outputLocationButton;
 
+    private RadioButton ptmButton;
+    private RadioButton hshButton;
     private RadioButton ptmRGBButton;
     private RadioButton ptmLRGBButton;
+    private Slider hshTermsSlider;
+    private HBox fitterOptionsBox;
+    private Label ptmTypeLabel;
+    private Label hshTermsLabel;
 
     private TextArea fitterOutputArea;
 
     private boolean useCrop;
 
-    private StackPane imageContainer;
-    private Rectangle cropRectangle;
 
     private static CropExecuteLayout ourInstance = new CropExecuteLayout();
 
@@ -70,7 +64,11 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         getStylesheets().add("stylesheets/default.css");
         CropExecuteLayoutListener.getInstance().init(this);
 
-        imagePreview.setImage(new Image("images/fish_fossil_01.jpg"));
+        cropColourSelector.getSelectionModel().select(ImageCropPane.Colour.BLUE);
+        imageCropPane.changeColour(ImageCropPane.Colour.BLUE);
+        hshButton.setSelected(true);
+
+        //imageCropPane.setImage(new Image("images/fish_fossil_01.jpg"));
     }
 
 
@@ -114,7 +112,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private VBox createLeftPane(){
         VBox vBox = new VBox();
         lpImagesGrid = new ScrollableImageGridForCrop("Images in LP File", false,
-                                                            true, true, imagePreview);
+                                                            true, true, imageCropPane);
         vBox.setMinWidth(200);
         vBox.setMaxWidth(400);
 
@@ -154,12 +152,43 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
                                                 outLocLabel, outputLocationField, outputLocationButton);
 
 
-        HBox ptmOptions = new HBox();
-            Label ptmTypeLabel = new Label("PTM type:");
-            ptmRGBButton = new RadioButton("RGB");
-            ptmLRGBButton = new RadioButton("LRGB");
-        ptmOptions.setPadding(new Insets(5, 5, 5,5));
-        ptmOptions.getChildren().addAll(ptmTypeLabel, createSpacer(), ptmRGBButton, createSpacer(), ptmLRGBButton);
+        HBox fitterTypeBox = new HBox();
+        fitterTypeBox.setId("fitterTypeBox");
+        Label fitterTypeLabel = new Label("Fitter type:");
+        ToggleGroup fitterTypeToggle = new ToggleGroup();
+        ptmButton = new RadioButton("PTM");
+        ptmButton.setId("ptmButton");
+        ptmButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmButton.setToggleGroup(fitterTypeToggle);
+        hshButton = new RadioButton("HSH");
+        hshButton.setId("hshButton");
+        hshButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        hshButton.setToggleGroup(fitterTypeToggle);
+        fitterTypeBox.getChildren().addAll(fitterTypeLabel, createSpacer(), ptmButton, createSpacer(), hshButton, createSpacer());
+        fitterTypeBox.setPadding(new Insets(5, 5, 5, 5));
+
+        fitterOptionsBox = new HBox();
+        fitterOptionsBox.setId("fitterOptionsBox");
+        ptmTypeLabel = new Label("PTM type:");
+        ptmTypeLabel.setMinWidth(fitterTypeLabel.getWidth());
+        ToggleGroup ptmTypeToggle = new ToggleGroup();
+        ptmRGBButton = new RadioButton("RGB");
+        ptmRGBButton.setId("rgbPTMButton");
+        ptmRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmRGBButton.setToggleGroup(ptmTypeToggle);
+        ptmLRGBButton = new RadioButton("LRGB");
+        ptmLRGBButton.setId("lrgbPTMButton");
+        ptmLRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmLRGBButton.setToggleGroup(ptmTypeToggle);
+        fitterOptionsBox.setAlignment(Pos.CENTER);
+
+        hshTermsLabel = new Label("HSH Terms:");
+        hshTermsSlider = new Slider();
+
+        fitterOptionsBox.setPadding(new Insets(5, 5, 5, 5));
+        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTermsSlider, createSpacer());
+
+
 
 
         VBox fitterOutputBox = new VBox();
@@ -176,7 +205,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         vBox.setSpacing(5);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
-        vBox.getChildren().addAll(fitterPaneTitle, fitterOutLocPane, ptmOptions, fitterOutputBox);
+        vBox.getChildren().addAll(fitterPaneTitle, fitterTypeBox, fitterOptionsBox, fitterOutLocPane, fitterOutputBox);
         return vBox;
     }
 
@@ -186,92 +215,21 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
     private VBox createCropPane(){
         VBox cropPane = new VBox();
-            imageBorderPane = new BorderPane();
-            imageBorderPane.setId("cropExecutePanePreview");
-            imageBorderPane.setStyle("-fx-background-color: #000000;");
-            imageBorderPane.prefHeightProperty().bind(cropPane.heightProperty());
-            imageBorderPane.setMinWidth(0);
-            imageBorderPane.setMinHeight(0);
-            imageBorderPane.prefWidthProperty().bind(cropPane.widthProperty());
-            imageBorderPane.prefHeightProperty().bind(cropPane.heightProperty());
-
-            cropRectangle = new Rectangle(0, 0, 10, 10);
-            cropRectangle.setVisible(false);
-            cropRectangle.setStrokeWidth(2);
-            cropRectangle.setFill(Color.TRANSPARENT);
-            cropRectangle.setStroke(Paint.valueOf("#ff0000"));
-
-            imagePreview = new ImageView();
-            imagePreview.setPreserveRatio(true);
-            imagePreview.setSmooth(true);
-            imagePreview.fitWidthProperty().bind(imageBorderPane.widthProperty());
-            imagePreview.fitHeightProperty().bind(imageBorderPane.heightProperty());
-
-            imageContainer = new StackPane(imagePreview, cropRectangle);
-            imageContainer.setMinWidth(0);
-            imageContainer.setMinHeight(0);
-            setupImageContainer();
-            imageBorderPane.setCenter(imageContainer);
+            imageCropPane = new ImageCropPane(cropWidthField, cropHeightField);
+            imageCropPane.setId("cropExecutePanePreview");
+            imageCropPane.setStyle("-fx-background-color: #000000;");
+            imageCropPane.prefHeightProperty().bind(cropPane.heightProperty());
+            imageCropPane.setMinWidth(0);
+            imageCropPane.setMinHeight(0);
+            imageCropPane.prefWidthProperty().bind(cropPane.widthProperty());
+            imageCropPane.prefHeightProperty().bind(cropPane.heightProperty());
 
         cropPane.setId("cropExecLayoutCropPane");
         cropPane.setAlignment(Pos.CENTER);
         cropPane.setSpacing(5);
         cropPane.setPadding(new Insets(0, 5, 0, 5));
-        cropPane.getChildren().addAll(imageBorderPane);
+        cropPane.getChildren().addAll(imageCropPane);
         return cropPane;
-    }
-
-
-
-    private void setupImageContainer(){
-        imageContainer.setMinHeight(0);
-        imageContainer.prefWidthProperty().bind(imagePreview.fitWidthProperty());
-        imageContainer.prefHeightProperty().bind(imagePreview.fitHeightProperty());
-        imageContainer.setMinWidth(0);
-
-        imageContainer.addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                /*
-                if(event.getEventType() == MouseEvent.MOUSE_CLICKED){
-                    cropRectangle.setVisible(true);
-                    cropRectangle.setTranslateX(event.getX());
-                    cropRectangle.setTranslateY(event.getY());
-                }
-
-                if(event.getEventType() == MouseEvent.MOUSE_DRAGGED){
-                    cropRectangle.setWidth(event.getX() - cropRectangle.getTranslateX());
-                    cropRectangle.setHeight(event.getY() - cropRectangle.getTranslateY());
-                }
-                */
-                double imageWidth = imagePreview.getBoundsInParent().getWidth();
-                double imageHeight = imagePreview.getBoundsInParent().getHeight();
-
-                double adjustedX = event.getX() - (imageContainer.getWidth() / 2);
-                double adjustedY = event.getY() - (imageContainer.getHeight() / 2);
-
-                if(event.getEventType() == MouseEvent.MOUSE_CLICKED){
-                    if (event.getY() < (0.5 * (imageContainer.getHeight() + imageHeight))
-                            && event.getY() > (0.5 * (imageContainer.getHeight() - imageHeight))
-                            && event.getX() < (0.5 * (imageContainer.getWidth() + imageWidth))
-                            && event.getX() > (0.5 * (imageContainer.getWidth() - imageWidth))) {
-                        System.out.println(event.getX() + ", " + event.getY());
-                        cropRectangle.setTranslateX(adjustedX);
-                        cropRectangle.setTranslateY(adjustedY);
-                    }
-                }
-
-                if(event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                    if (event.getY() < (0.5 * (imageContainer.getHeight() + imageHeight))
-                            && event.getY() > (0.5 * (imageContainer.getHeight() - imageHeight))
-                            && event.getX() < (0.5 * (imageContainer.getWidth() + imageWidth))
-                            && event.getX() > (0.5 * (imageContainer.getWidth() - imageWidth))) {
-                        cropRectangle.setWidth((adjustedX - cropRectangle.getTranslateX()) * 2);
-                        cropRectangle.setHeight((adjustedY - cropRectangle.getTranslateY()) * 2);
-                    }
-                }
-            }
-        });
     }
 
 
@@ -306,11 +264,12 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
                                                 cropHeightLabel, cropHeightField);
 
         HBox cropButtonsBox = new HBox();
-        clearCropButton = new Button("Clear crop");
-        clearCropButton.disableProperty().bind(useCropCheckBox.selectedProperty().not());
-        cropColourButton = new Button("Crop colour");
-        cropColourButton.disableProperty().bind(useCropCheckBox.selectedProperty().not());
-        cropButtonsBox.getChildren().addAll(clearCropButton, cropColourButton);
+        Label cropColorLabel = new Label("Crop colour:");
+        cropColorLabel.disableProperty().bind(useCropCheckBox.selectedProperty().not());
+        cropColourSelector = createColourSelector();
+
+        cropColourSelector.disableProperty().bind(useCropCheckBox.selectedProperty().not());
+        cropButtonsBox.getChildren().addAll(cropColorLabel, cropColourSelector);
         cropButtonsBox.setAlignment(Pos.CENTER);
         cropButtonsBox.setSpacing(10);
 
@@ -322,6 +281,17 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         HBox.setHgrow(cropOptions, Priority.NEVER);
 
         return cropOptions;
+    }
+
+    private ComboBox<ImageCropPane.Colour> createColourSelector(){
+        ComboBox<ImageCropPane.Colour> box = new ComboBox<>();
+
+        box.getItems().addAll(ImageCropPane.Colour.BLACK, ImageCropPane.Colour.GREY, ImageCropPane.Colour.WHITE,
+                                ImageCropPane.Colour.RED, ImageCropPane.Colour.GREEN, ImageCropPane.Colour.BLUE);
+
+        box.setId("colourSelectorBox");
+        box.setOnAction(CropExecuteLayoutListener.getInstance());
+        return box;
     }
 
 
@@ -347,7 +317,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         backButton.setOnAction(CropExecuteLayoutListener.getInstance());
 
         runFitterButton = new Button("Run Fitter");
-        runFitterButton.setId("runFitterBtn");
+        runFitterButton.setId("runFitterButton");
         runFitterButton.setOnAction(CropExecuteLayoutListener.getInstance());
 
         Pane spacer = createSpacer();
@@ -388,6 +358,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         cropPane.setPrefHeight(height);
         fitterOutputArea.setPrefHeight(height);
         fitterInterfacePane.setPrefHeight(height);
+        imageCropPane.updateSize();
     }
 
 
@@ -396,17 +367,53 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             lpImagesGrid.addImageTile(tile);
             tile.setParent(lpImagesGrid);
         }
-        lpImagesGrid.setImageView(imagePreview);
+        lpImagesGrid.setImageView(imageCropPane);
     }
 
 
     public void enableCrop(){
+        if(imageCropPane.getImage() == null){
+            imageCropPane.setImage(lpImagesGrid.getAllImages()[0]);
+        }
+
         useCrop = true;
-        cropRectangle.setVisible(true);
+        imageCropPane.setCropActive(true);
     }
 
     public void disableCrop(){
         useCrop = false;
-        cropRectangle.setVisible(false);
+        imageCropPane.setCropActive(false);
+    }
+
+    public void setCropColour(ImageCropPane.Colour colour){
+        imageCropPane.changeColour(colour);
+    }
+
+    public void setPTMOptions(){
+        fitterOptionsBox.getChildren().clear();
+        fitterOptionsBox.getChildren().addAll(ptmTypeLabel, createSpacer(), ptmRGBButton,
+                                            createSpacer(), ptmLRGBButton, createSpacer());
+    }
+
+    public void setHSHOptions(){
+        fitterOptionsBox.getChildren().clear();
+        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTermsSlider, createSpacer());
+    }
+
+    public boolean isUseCrop() {
+        return useCrop;
+    }
+
+    public ScrollableImageGridForCrop getLpImagesGrid() {
+        return lpImagesGrid;
+    }
+
+    public int[] getCropParams(){
+        int x = imageCropPane.getCropXInImage();
+        int y = imageCropPane.getCropYInImage();
+        int width = imageCropPane.getCropWidthInImage();
+        int height = imageCropPane.getCropHeightInImage();
+
+        return new int[]{x, y, width, height};
     }
 }

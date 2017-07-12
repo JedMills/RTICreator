@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import newProjectScene.NewProjectLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -38,25 +39,30 @@ public class Main extends Application {
     public static Alert fileReadingAlert;
     private static LoadingDialog loadingDialog;
 
-    private static RTIProject currentRTIProjct;
+    public static RTIProject currentRTIProjct;
+    public static File currentImagesFolder;
+    public static File currentAssemblyFolder;
+    public static File currentLPFile;
 
     private static Scene initialScene;
     private static Scene newProjScene;
     private static Scene cropExecuteScene;
 
+    public static final Image thumbnail = new Image("images/rtiThumbnail.png");
+
+    public static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Main.primaryStage = primaryStage;
         primaryStage.setTitle("RTI Creator");
-        Image thumbnail = new Image("images/rtiThumbnail.png");
         primaryStage.getIcons().add(thumbnail);
 
         setupDialogs();
         createScenes();
 
-        //setCreatorStage(initialScene, InitialLayout.getInstance());
-        setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
+        setCreatorStage(initialScene, InitialLayout.getInstance());
+        //setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override

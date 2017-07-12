@@ -56,7 +56,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
     private File imgsFolder;
-    private File outFolder;
+    private File assemblyFileFolder;
     private File lpFile;
 
     private RTIProject rtiProject;
@@ -387,7 +387,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         mainLayout.getChildren().clear();
         getChildren().clear();
 
-        if(Utils.checkIn(type, new ProjectType[]{ProjectType.HIGHLIGHT_PTM, ProjectType.HIGHLIGHT_HSH})){
+        if(type.equals(ProjectType.HIGHLIGHT)){
             mainLayout.getChildren().addAll(toolbarLayout, selectedImages, removePicPane, rejectedImages);
         }else{
             mainLayout.getChildren().addAll(toolbarLayout, selectedImages);
@@ -427,17 +427,19 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
 
 
-    public void setResources(String imgsLocation, String outLocation){
+    public void setResources(String imgsLocation, String assemblyFilesLocation){
         File imgsFolder = new File(imgsLocation);
-        File outFolder = new File(outLocation);
+        File assemblyFileFolder = new File(assemblyFilesLocation);
 
-        if((!imgsFolder.exists()) || (!outFolder.exists()) || (!imgsFolder.isDirectory()) || (!outFolder.isDirectory())){
+        if((!imgsFolder.exists()) || (!assemblyFileFolder.exists()) || (!imgsFolder.isDirectory()) || (!assemblyFileFolder.isDirectory())){
             Main.showFileReadingAlert("Cannot find specified directories. Check that they still exist.");
             return;
         }
 
         this.imgsFolder = imgsFolder;
-        this.outFolder = outFolder;
+        Main.currentImagesFolder = imgsFolder;
+        this.assemblyFileFolder = assemblyFileFolder;
+        Main.currentAssemblyFolder = assemblyFileFolder;
 
         new Thread(new Runnable() {
             @Override
@@ -452,17 +454,18 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
 
 
-    public void setResources(String imgsLocation, String lpLocation, String outLocation){
+    public void setResources(String imgsLocation, String lpLocation, String assemblyFilesLocation){
         File lpFile = new File(lpLocation);
 
         this.lpFile = lpFile;
+        Main.currentLPFile = lpFile;
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     lpData = Utils.readLPFile(lpFile);
-                    setResources(imgsLocation, outLocation);
+                    setResources(imgsLocation, assemblyFilesLocation);
                 }catch(IOException e){
                     Main.showFileReadingAlert("Error accessing LP file at: " + lpLocation);
                 }catch(Utils.LPException e){
@@ -567,8 +570,8 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         return imgsFolder;
     }
 
-    public File getOutFolder() {
-        return outFolder;
+    public File getAssemblyFileFolder() {
+        return assemblyFileFolder;
     }
 
     public File getLpFile() {

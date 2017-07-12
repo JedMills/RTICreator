@@ -52,6 +52,7 @@ public class AddPropertyDialog {
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(Main.primaryStage);
         stage.setTitle("Add Project Property");
+        stage.getIcons().add(Main.thumbnail);
 
         VBox layout = createLayout();
         Scene scene = new Scene(layout);

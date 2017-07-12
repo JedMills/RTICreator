@@ -35,13 +35,13 @@ public class LoadProjRsrcsDialog {
 
     private Button browseImgLocationHL;
     private TextField imgLocationFieldHL;
-    private Button browseOutLocationHL;
-    private TextField outLocationFieldHL;
+    private Button browseAssemblyLocationHL;
+    private TextField assemblyLocationFieldHL;
 
     private Button browseImgLocationLP;
     private TextField imgLocationFieldLP;
-    private Button browseOutLocationLP;
-    private TextField outLocationFieldLP;
+    private Button browseAssemblyLocationLP;
+    private TextField assemblyLocationFieldLP;
     private Button browseLPLocation;
     private TextField lpLocationField;
 
@@ -66,9 +66,11 @@ public class LoadProjRsrcsDialog {
         stage = new Stage(StageStyle.UNIFIED);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(Main.primaryStage);
-        stage.setTitle("Specify Project Resources");
+        stage.setTitle("Find Project Resources");
         stage.setMinWidth(390);
         stage.setMaxWidth(840);
+
+        stage.getIcons().add(Main.thumbnail);
 
         initComponents();
         highlightLayout = new Scene(createHighlightLayout());
@@ -104,13 +106,13 @@ public class LoadProjRsrcsDialog {
     private void initComponents(){
         imgLocationFieldHL = new TextField();
         browseImgLocationHL = new Button("Browse");
-        outLocationFieldHL = new TextField();
-        browseOutLocationHL = new Button("Browse");
+        assemblyLocationFieldHL = new TextField();
+        browseAssemblyLocationHL = new Button("Browse");
 
         browseImgLocationLP = new Button("Browse");
         imgLocationFieldLP = new TextField();
-        browseOutLocationLP = new Button("Browse");
-        outLocationFieldLP = new TextField();
+        browseAssemblyLocationLP = new Button("Browse");
+        assemblyLocationFieldLP = new TextField();
         browseLPLocation = new Button("Browse");
         lpLocationField = new TextField();
 
@@ -120,16 +122,16 @@ public class LoadProjRsrcsDialog {
         okButtonLP = new Button("OK");
         cancelButtonLP = new Button("Cancel");
 
-         textFields =  new TextField[]{imgLocationFieldLP, imgLocationFieldHL, outLocationFieldLP,
-                outLocationFieldHL, lpLocationField};
+         textFields =  new TextField[]{imgLocationFieldLP, imgLocationFieldHL, assemblyLocationFieldLP,
+                assemblyLocationFieldHL, lpLocationField};
 
         for(TextField textField : textFields){
             textField.setEditable(false);
         }
 
 
-        for(Button button : new Button[]{browseImgLocationHL, browseImgLocationLP, browseOutLocationHL,
-                browseOutLocationLP, browseLPLocation}){
+        for(Button button : new Button[]{browseImgLocationHL, browseImgLocationLP, browseAssemblyLocationHL,
+                browseAssemblyLocationLP, browseLPLocation}){
             button.setMinWidth(button.USE_PREF_SIZE);
         }
 
@@ -177,7 +179,7 @@ public class LoadProjRsrcsDialog {
 
 
     private void addImagesLocationComponents(DialogType type, GridPane gridPane, int rowNum){
-        Label imagesLabel = new Label("Image folder location:");
+        Label imagesLabel = new Label("Image folder:");
         imagesLabel.setMinWidth(imagesLabel.USE_PREF_SIZE);
         GridPane.setConstraints(imagesLabel, 0, rowNum, 1, 1);
 
@@ -194,24 +196,24 @@ public class LoadProjRsrcsDialog {
 
 
     private void addOutFolderLocationComponents(DialogType type, GridPane gridPane, int rowNum){
-        Label outLabel = new Label("Output folder location:");
+        Label outLabel = new Label("Folder for assembly files:");
         outLabel.setMinWidth(outLabel.USE_PREF_SIZE);
         GridPane.setConstraints(outLabel, 0, rowNum, 1, 1);
 
         if(type.equals(DialogType.HIGHLIGHT)) {
-            GridPane.setConstraints(outLocationFieldHL, 1, rowNum, 1, 1);
-            GridPane.setConstraints(browseOutLocationHL, 2, rowNum, 1, 1);
-            gridPane.getChildren().addAll(outLabel, outLocationFieldHL, browseOutLocationHL);
+            GridPane.setConstraints(assemblyLocationFieldHL, 1, rowNum, 1, 1);
+            GridPane.setConstraints(browseAssemblyLocationHL, 2, rowNum, 1, 1);
+            gridPane.getChildren().addAll(outLabel, assemblyLocationFieldHL, browseAssemblyLocationHL);
         }else if(type.equals(DialogType.LP)){
-            GridPane.setConstraints(outLocationFieldLP, 1, rowNum, 1, 1);
-            GridPane.setConstraints(browseOutLocationLP, 2, rowNum, 1, 1);
-            gridPane.getChildren().addAll(outLabel, outLocationFieldLP, browseOutLocationLP);
+            GridPane.setConstraints(assemblyLocationFieldLP, 1, rowNum, 1, 1);
+            GridPane.setConstraints(browseAssemblyLocationLP, 2, rowNum, 1, 1);
+            gridPane.getChildren().addAll(outLabel, assemblyLocationFieldLP, browseAssemblyLocationLP);
         }
     }
 
 
     private void addLPFileLocationComponents(GridPane gridPane, int rowNum){
-        Label lpLabel = new Label("LP file location:");
+        Label lpLabel = new Label("LP file:");
         lpLabel.setMinWidth(lpLabel.USE_PREF_SIZE);
         GridPane.setConstraints(lpLabel, 0, rowNum, 1, 1);
 
@@ -265,8 +267,8 @@ public class LoadProjRsrcsDialog {
         linkDirButtonToTextField("Select project images folder", browseImgLocationHL, imgLocationFieldHL);
         linkDirButtonToTextField("Select project images folder", browseImgLocationLP, imgLocationFieldLP);
 
-        linkDirButtonToTextField("Select project output folder", browseOutLocationHL, outLocationFieldHL);
-        linkDirButtonToTextField("Select project output folder", browseOutLocationLP, outLocationFieldLP);
+        linkDirButtonToTextField("Select project output folder", browseAssemblyLocationHL, assemblyLocationFieldHL);
+        linkDirButtonToTextField("Select project output folder", browseAssemblyLocationLP, assemblyLocationFieldLP);
 
         linkFileButtonToTextField("Select LP file", browseLPLocation, lpLocationField);
 
@@ -282,8 +284,8 @@ public class LoadProjRsrcsDialog {
         cancelButtonLP.setOnAction(close);
         cancelButtonHL.setOnAction(close);
 
-        okButtonHL.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldHL, outLocationFieldHL}));
-        okButtonLP.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldLP, lpLocationField, outLocationFieldLP}));
+        okButtonHL.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldHL, assemblyLocationFieldHL}));
+        okButtonLP.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldLP, lpLocationField, assemblyLocationFieldLP}));
     }
 
 
@@ -306,10 +308,10 @@ public class LoadProjRsrcsDialog {
 
                 }else{
                     if(fields.length == 2) {
-                        newProjectLayout.setResources(imgLocationFieldHL.getText(), outLocationFieldHL.getText());
+                        newProjectLayout.setResources(imgLocationFieldHL.getText(), assemblyLocationFieldHL.getText());
                     }else if(fields.length == 3){
                         newProjectLayout.setResources(imgLocationFieldLP.getText(),
-                                lpLocationField.getText(), outLocationFieldLP.getText());
+                                lpLocationField.getText(), assemblyLocationFieldLP.getText());
                     }
                 }
                 stage.close();

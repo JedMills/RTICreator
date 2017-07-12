@@ -1,5 +1,6 @@
 package guiComponents;
 
+import cropExecuteScene.ImageCropPane;
 import javafx.scene.image.ImageView;
 
 /**
@@ -7,12 +8,12 @@ import javafx.scene.image.ImageView;
  */
 public class ScrollableImageGridForCrop extends ScrollableImageGrid {
 
-    private ImageView imageView;
+    private ImageCropPane imageCropPane;
 
     public ScrollableImageGridForCrop(String title, boolean tickBox, boolean clickable, boolean preview,
-                                      ImageView imageView) {
+                                      ImageCropPane imageCropPane) {
         super(title, tickBox, clickable, preview);
-        this.imageView = imageView;
+        this.imageCropPane = imageCropPane;
     }
 
 
@@ -20,11 +21,11 @@ public class ScrollableImageGridForCrop extends ScrollableImageGrid {
     public void setSelectedTile(ImageGridTile tile) {
         super.setSelectedTile(tile);
 
-        imageView.setImage(tile.getImage());
+        imageCropPane.setImage(tile.getImage());
     }
 
 
-    public void setImageView(ImageView imageView){
-        this.imageView = imageView;
+    public void setImageView(ImageCropPane imageCropPane){
+        this.imageCropPane = imageCropPane;
     }
 }

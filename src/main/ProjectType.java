@@ -5,12 +5,9 @@ package main;
  */
 public enum ProjectType {
 
-    HIGHLIGHT_HSH   ("Highlight based - PTM fitter"),
-    HIGHLIGHT_PTM   ("Highlight based - HSH fitter"),
-    DOME_LP_HSH     ("Dome LP file - HSH fitter"),
-    DOME_LP_PTM     ("Dome LP file - PTM fitter"),
-    LP_HSH          ("LP file - PTM fitter"),
-    LP_PTM          ("LP file - HSH fitter");
+    HIGHLIGHT   ("Highlight based"),
+    DOME_LP     ("Dome LP file"),
+    LP          ("LP file");
 
     private String label;
 

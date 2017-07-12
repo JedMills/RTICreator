@@ -2,10 +2,7 @@ package initialScene;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -19,7 +16,8 @@ import main.ProjectType;
 public class InitialLayout extends VBox implements CreatorScene {
 
     private Image rtiLogo;
-    private ComboBox<ProjectType> projectOptions;
+    private RadioButton highlightProjBtn;
+    private RadioButton lpFileProjBtn;
     private Button startNewProjectBtn;
     private Button openExistingProjectBtn;
     private TextField projectNameField;
@@ -49,36 +47,41 @@ public class InitialLayout extends VBox implements CreatorScene {
         imageView.fitWidthProperty().bind(Main.primaryStage.widthProperty());
         imageView.setFitHeight(100);
 
-        GridPane gridPane = new GridPane();
 
+        VBox projectOptionsContainer = new VBox();
+        projectOptionsContainer.setId("initialLayoutOptionsBox");
+        projectOptionsContainer.setPadding(new Insets(10 , 10 ,10, 10));
+
+        HBox nameHBox = new HBox();
         Label projectNameLabel = new Label("Project name:");
-        GridPane.setConstraints(projectNameLabel, 0, 0, 1, 1);
-
+        projectNameLabel.setMinWidth(Label.USE_PREF_SIZE);
         projectNameField = new TextField();
-        GridPane.setConstraints(projectNameField, 1, 0, 1, 1);
         projectNameField.setMinWidth(0);
+        projectNameField.prefWidthProperty().bind(widthProperty());
+        nameHBox.getChildren().addAll(projectNameLabel, projectNameField);
+        nameHBox.setSpacing(10);
+        nameHBox.setAlignment(Pos.CENTER_LEFT);
 
+        HBox projTypeBox = new HBox();
         Label projectOptionsLabel = new Label("Project type:");
-        GridPane.setConstraints(projectOptionsLabel, 0, 1, 1, 1);
-
-        projectOptions = new ComboBox<>();
-        projectOptions.getItems().setAll(ProjectType.values());
-        GridPane.setConstraints(projectOptions, 1, 1, 1, 1);
-        projectOptions.setMinWidth(0);
 
 
-        gridPane.setAlignment(Pos.TOP_CENTER);
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setId("initialLayoutGridPane");
-        gridPane.setPadding(new Insets(10, 0, 10, 0));
+        ToggleGroup toggleGroup = new ToggleGroup();
+        highlightProjBtn = new RadioButton("Highlight - detection");
+        highlightProjBtn.setToggleGroup(toggleGroup);
+        lpFileProjBtn = new RadioButton("Existing LP File");
+        lpFileProjBtn.setToggleGroup(toggleGroup);
 
-        setMargin(gridPane, new Insets(10, 10, 10, 10));
+        projTypeBox.getChildren().addAll(projectOptionsLabel, createSpacer(), highlightProjBtn, createSpacer(), lpFileProjBtn, createSpacer());
+        projTypeBox.setSpacing(10);
+        projTypeBox.setAlignment(Pos.CENTER_LEFT);
 
-        gridPane.getChildren().addAll(projectNameLabel, projectNameField, projectOptionsLabel, projectOptions);
+        projectOptionsContainer.setSpacing(10);
+        projectOptionsContainer.getChildren().addAll(nameHBox, projTypeBox);
 
         HBox hBox = new HBox();
         hBox.setId("initialLayoutHBox");
+
 
         startNewProjectBtn = new Button("Start new project");
         startNewProjectBtn.setId("startNewProject");
@@ -93,11 +96,18 @@ public class InitialLayout extends VBox implements CreatorScene {
         hBox.setAlignment(Pos.CENTER);
         hBox.setPadding(new Insets(10, 0, 10, 0));
         setMargin(hBox, new Insets(10, 10, 10, 10));
+        setMargin(projectOptionsContainer, new Insets(20, 10, 10, 10));
 
         setAlignment(Pos.TOP_CENTER);
-        getChildren().addAll(borderPane, gridPane, hBox);
+        getChildren().addAll(borderPane, projectOptionsContainer, hBox);
     }
 
+    private Pane createSpacer(){
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        spacer.setMinSize(1, 1);
+        return spacer;
+    }
 
     @Override
     public int getSceneMinWidth() {
@@ -122,13 +132,15 @@ public class InitialLayout extends VBox implements CreatorScene {
 
     @Override
     public void updateSize(double width, double height) {
-        projectNameField.setPrefWidth(width / 1.5);
-        projectOptions.setPrefWidth(width / 1.5);
+
     }
 
+    public RadioButton getHighlightProjBtn() {
+        return highlightProjBtn;
+    }
 
-    public ComboBox<ProjectType> getProjectOptions() {
-        return projectOptions;
+    public RadioButton getLpFileProjBtn() {
+        return lpFileProjBtn;
     }
 
     public Button getStartNewProjectBtn() {

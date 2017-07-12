@@ -38,8 +38,12 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
             if(source.getId().equals("startNewProject")){
                 if(checkInputs()){
-                    RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(),
-                                                                initialLayout.getProjectOptions().getSelectionModel().getSelectedItem());
+                    ProjectType projectType = null;
+
+                    if(initialLayout.getHighlightProjBtn().isSelected()){projectType = ProjectType.HIGHLIGHT;}
+                    else if (initialLayout.getLpFileProjBtn().isSelected()){projectType = ProjectType.DOME_LP;}
+
+                    RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(), projectType);
                     Main.changeToNewProjLayout(createdProject);
                 }
             }else if(source.getId().equals("openExistingProject")){
@@ -58,7 +62,14 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
     private boolean checkInputs(){
         String projectName = initialLayout.getProjectNameField().getText();
-        ProjectType projectType = initialLayout.getProjectOptions().getSelectionModel().getSelectedItem();
+
+        boolean projectSelected = false;
+
+        if(initialLayout.getHighlightProjBtn().isSelected() ||initialLayout.getLpFileProjBtn().isSelected()){
+            projectSelected = true;
+        }
+
+
         boolean validInput = true;
 
         if((!projectName.replaceAll("\\w|[_]", "").equals("")) || projectName.equals("")){
@@ -74,19 +85,18 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
                 }
             });
 
-        }else if(projectType == null){
-            Main.inputAlert.setContentText("Please select a project type.");
+        }else if(!projectSelected){
             validInput = false;
 
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    Main.inputAlert.showAndWait();
-                    initialLayout.getProjectOptions().requestFocus();
+                    Main.showInputAlert("Please select a project type.");
                 }
             });
         }
 
         return validInput;
     }
+
 }

@@ -39,8 +39,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
             Button source = (Button) event.getSource();
 
             if(source.getId().equals("openFolder")){
-                if(Utils.checkIn(newProjectLayout.getProjectType(),
-                        new ProjectType[]{ProjectType.HIGHLIGHT_HSH, ProjectType.HIGHLIGHT_PTM})){
+                if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
                     LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.HIGHLIGHT);
                 }else{
                     LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.LP);
@@ -75,22 +74,13 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 newProjectLayout.resetScene();
 
             }else if(source.getId().equals("nextBtn")){
-                if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP_PTM)){
+                if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP)){
                     moveSceneDomePTM();
 
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP_HSH)){
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
                     System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
 
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT_PTM)){
-                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
-
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT_HSH)){
-                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
-
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP_PTM)){
-                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
-
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP_HSH)){
+                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP)){
                     System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
 
                 }

@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import main.Main;
 
 /**
  * Created by jed on 07/07/2017.
@@ -127,6 +128,7 @@ public class ImageGridTile extends VBox {
                         imageView.fitWidthProperty().bind(borderPane.widthProperty());
 
                         newStage.setTitle("Preview: " + name);
+                        newStage.getIcons().add(Main.thumbnail);
                         Scene scene = new Scene(borderPane, Color.BLACK);
                         newStage.setScene(scene);
                         newStage.show();
