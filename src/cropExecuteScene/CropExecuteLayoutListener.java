@@ -40,13 +40,11 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         return ourInstance;
     }
 
-    private CropExecuteLayoutListener() {
-    }
+    private CropExecuteLayoutListener() {}
 
     public void init(CropExecuteLayout cropExecuteLayout){
         this.cropExecuteLayout = cropExecuteLayout;
     }
-
 
     @Override
     public void handle(ActionEvent event) {
@@ -54,7 +52,17 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             Button source = (Button) event.getSource();
 
             if(source.getId().equals("runFitterButton")){
+
+                if(!checkFitterInputs()){ return; }
+
                 runFitter();
+
+            }else if(source.getId().equals("browseFitterLocation")){
+                browseFitterLocation();
+
+            }else if(source.getId().equals("browseOutputLocation")){
+                browseOutputLocation();
+
             }
 
         }else if(event.getSource() instanceof CheckBox){
@@ -84,23 +92,55 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
     }
 
 
+    private boolean checkFitterInputs(){
+        String fitterLoc = cropExecuteLayout.getFitterLocation();
+        String outLoc = cropExecuteLayout.getOutputLocation();
+
+        if(fitterLoc.equals("") || outLoc.equals("")){
+            Main.showInputAlert("Please select locations of the fitter program and output destination");
+            return false;
+        }
+
+        return true;
+    }
+
+
+
     private void runFitter(){
-        File lpFile;
+        File lpFile = null;
         if(cropExecuteLayout.isUseCrop()){
             lpFile = cropAndCreateLPFile();
 
         }else if(!cropExecuteLayout.getImagesFormat().equals("jpg")){
             lpFile = convertImagesAndCreateLPFile();
 
+        }else{
+            lpFile = createLPFileJPEGNoCrop();
+
         }
+
+        String fitterLoction = cropExecuteLayout.getFitterLocation();
+        String lpFileLocation = lpFile.getAbsolutePath();
     }
+
+
+
+    private File createLPFileJPEGNoCrop(){
+        System.out.println("Creating LP File JPEG no crop...");
+        System.out.println(Main.currentImagesFolder.getAbsolutePath());
+        return createNewLPFile(Main.currentAssemblyFolder.getAbsolutePath(),
+                                "_default" + ".lp",
+                                true, null);
+    }
+
+
 
 
 
     private File convertImagesAndCreateLPFile(){
         Main.showLoadingDialog("Converting images...");
         final String convertedFolderLocation = Main.currentAssemblyFolder.getAbsolutePath() +
-                "\\" + Main.currentRTIProjct.getName() + "_convertedJPEGS";
+                "/" + Main.currentRTIProjct.getName() + "_convertedJPEGS";
         File convertedFolder = new File(convertedFolderLocation);
 
         if(!convertedFolder.exists()){ convertedFolder.mkdir(); }
@@ -114,14 +154,13 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             public void accept(ImageGridTile tile) {
                 BufferedImage jpgImg = fxImageToBufferedJPEG(tile.getImage());
                 String tileNameNoExt = tile.getName().split("[.]")[0];
-                File destination = new File(convertedFolder.getAbsolutePath() + "\\" + tileNameNoExt + ".jpg");
+                File destination = new File(convertedFolder.getAbsolutePath() + "/" + tileNameNoExt + ".jpg");
 
                 try{
                     ImageIO.write(jpgImg, "jpg", destination);
                 }catch (IOException e){
                     e.printStackTrace();
                     success.setB(false);
-                    return;
                 }
             }
         });
@@ -140,7 +179,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
     private File cropAndCreateLPFile(){
         Main.showLoadingDialog("Cropping images...");
         final String croppedFolderLocation = Main.currentAssemblyFolder.getAbsolutePath() +
-                "\\" + Main.currentRTIProjct.getName() + "_croppedFiles";
+                "/" + Main.currentRTIProjct.getName() + "_croppedFiles";
         File croppedFolder = new File(croppedFolderLocation);
 
         if(!croppedFolder.exists()){ croppedFolder.mkdir(); }
@@ -165,9 +204,9 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
                 File destination;
                 if(areJPEGS.isB()) {
-                    destination = new File(croppedFolder.getAbsolutePath() + "\\" + tile.getName());
+                    destination = new File(croppedFolder.getAbsolutePath() + "/" + tile.getName());
                 }else{
-                    destination = new File(croppedFolder.getAbsolutePath() + "\\" +
+                    destination = new File(croppedFolder.getAbsolutePath() + "/" +
                                                         tile.getName().split("[.]")[0] + ".jpg");
                 }
                 try {
@@ -194,7 +233,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
 
     private File createNewLPFile(String parentDirLoc, String lpFileName, boolean useOriginalImgExt, String newExt){
-        File newLPFile = new File(parentDirLoc + "\\" +
+        File newLPFile = new File(parentDirLoc + "/" +
                 Main.currentRTIProjct.getName() + lpFileName);
 
         Main.showLoadingDialog("Creating new LP file...");
@@ -212,11 +251,10 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             for(String key : originalLPData.keySet()){
                 originalImageFile = new File(key);
 
-                if(useOriginalImgExt){ name = parentDirLoc + "\\" + originalImageFile.getName(); }
+                if(useOriginalImgExt){ name = parentDirLoc + "/" + originalImageFile.getName(); }
                 else{
-                    name = originalImageFile.getName().split("[.]")[0] + newExt;
+                    name = parentDirLoc + "/" + originalImageFile.getName().split("[.]")[0] + newExt;
                 }
-
 
                 x = String.valueOf(originalLPData.get(key).getX());
                 y = String.valueOf(originalLPData.get(key).getY());
@@ -272,4 +310,34 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         return newImg;
     }
 
+
+
+
+    private void browseFitterLocation(){
+        if(cropExecuteLayout.ptmSelected()){
+            Main.fileChooser.setTitle("Select PTM Fitter");
+        }else{
+            Main.fileChooser.setTitle("Select HSH Fitter");
+        }
+        File fitter = Main.fileChooser.showOpenDialog(Main.primaryStage);
+
+        if(fitter != null){
+            cropExecuteLayout.setFitterLocation(fitter.getAbsolutePath());
+        }
+    }
+
+
+    private void browseOutputLocation(){
+        if(cropExecuteLayout.ptmSelected()){
+            Main.fileChooser.setTitle("Select Destination For PTM");
+        }else{
+            Main.fileChooser.setTitle("Select Destination For HSH");
+        }
+
+        File dest = Main.fileChooser.showSaveDialog(Main.primaryStage);
+
+        if(dest != null){
+            cropExecuteLayout.setOutputLocation(dest.getAbsolutePath());
+        }
+    }
 }

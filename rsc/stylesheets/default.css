@@ -1,4 +1,4 @@
-#initialLayoutOptionsBox, #initialLayoutHBox, GridPane, .projectPropertiesPane,
+#initialLayoutOptionsBox, #initialLayoutHBox, GridPane, .projectPropertiesPane, .bottomBar,
 #openBtnBox, #removePicPane, #fitterPane, #cropExecLayoutCropOptions, #fitterTypeBox, #fitterOptionsBox{
     -fx-border-color: #dddddd;
     -fx-border-radius: 5;

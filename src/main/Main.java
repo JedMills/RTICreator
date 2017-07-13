@@ -50,7 +50,6 @@ public class Main extends Application {
 
     public static final Image thumbnail = new Image("images/rtiThumbnail.png");
 
-    public static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 
     @Override
     public void start(Stage primaryStage) throws Exception {

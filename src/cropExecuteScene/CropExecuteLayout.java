@@ -43,7 +43,9 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private RadioButton hshButton;
     private RadioButton ptmRGBButton;
     private RadioButton ptmLRGBButton;
-    private Slider hshTermsSlider;
+    private RadioButton hshTerms1;
+    private RadioButton hshTerms2;
+    private RadioButton hshTerms3;
     private HBox fitterOptionsBox;
     private Label ptmTypeLabel;
     private Label hshTermsLabel;
@@ -135,15 +137,21 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             Label fitterLocLabel = new Label("Fitter location:");
             GridPane.setConstraints(fitterLocLabel, 0, 0);
             fitterLocationField = new TextField();
+            fitterLocationField.setEditable(false);
             GridPane.setConstraints(fitterLocationField, 1, 0);
             fitterLocationButton = new Button("Browse");
+            fitterLocationButton.setId("browseFitterLocation");
+            fitterLocationButton.setOnAction(CropExecuteLayoutListener.getInstance());
             GridPane.setConstraints(fitterLocationButton, 2, 0);
 
             Label outLocLabel = new Label("Output file:");
             GridPane.setConstraints(outLocLabel, 0, 1);
             outputLocationField = new TextField();
+            outputLocationField.setEditable(false);
             GridPane.setConstraints(outputLocationField, 1, 1);
             outputLocationButton = new Button("Browse");
+            outputLocationButton.setId("browseOutputLocation");
+            outputLocationButton.setOnAction(CropExecuteLayoutListener.getInstance());
             GridPane.setConstraints(outputLocationButton, 2, 1);
         fitterOutLocPane.setHgap(10);
         fitterOutLocPane.setVgap(10);
@@ -178,16 +186,24 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         ptmRGBButton.setToggleGroup(ptmTypeToggle);
         ptmLRGBButton = new RadioButton("LRGB");
         ptmLRGBButton.setId("lrgbPTMButton");
+        ptmLRGBButton.setSelected(true);
         ptmLRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
         ptmLRGBButton.setToggleGroup(ptmTypeToggle);
         fitterOptionsBox.setAlignment(Pos.CENTER);
 
         hshTermsLabel = new Label("HSH Terms:");
-        hshTermsSlider = new Slider();
+        ToggleGroup hshToggleGroup = new ToggleGroup();
+        hshTerms1 = new RadioButton("1");
+        hshTerms1.setToggleGroup(hshToggleGroup);
+        hshTerms2 = new RadioButton("2");
+        hshTerms2.setToggleGroup(hshToggleGroup);
+        hshTerms3 = new RadioButton("3");
+        hshTerms3.setToggleGroup(hshToggleGroup);
 
         fitterOptionsBox.setPadding(new Insets(5, 5, 5, 5));
-        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTermsSlider, createSpacer());
-
+        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTerms1, createSpacer(),
+                                                hshTerms2, createSpacer(), hshTerms3, createSpacer());
+        hshTerms2.setSelected(true);
 
 
 
@@ -312,6 +328,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
     private HBox createBottomBar(){
         HBox hBox = new HBox();
+        hBox.getStyleClass().add("bottomBar");
         backButton = new Button("< Back");
         backButton.setId("backBtn");
         backButton.setOnAction(CropExecuteLayoutListener.getInstance());
@@ -397,7 +414,8 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
     public void setHSHOptions(){
         fitterOptionsBox.getChildren().clear();
-        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTermsSlider, createSpacer());
+        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTerms1, createSpacer(),
+                hshTerms2, createSpacer(), hshTerms3, createSpacer());
     }
 
     public boolean isUseCrop() {
@@ -423,4 +441,30 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
         return imageName.substring(imageName.length() - 3);
     }
+
+
+    public String getFitterLocation(){
+        return fitterLocationField.getText();
+    }
+
+    public void setFitterLocation(String location){
+        fitterLocationField.setText(location);
+    }
+
+    public String getOutputLocation(){
+        return outputLocationField.getText();
+    }
+
+    public void setOutputLocation(String location){
+        outputLocationField.setText(location);
+    }
+
+    public boolean ptmSelected(){
+        return ptmButton.isSelected();
+    }
+
+    public boolean hshSelected(){
+        return hshButton.isSelected();
+    }
+
 }

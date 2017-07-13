@@ -215,6 +215,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     private HBox createNextBackBox(){
         HBox hBox = new HBox();
+        hBox.getStyleClass().add("bottomBar");
         backBtn = new Button("< Back");
         backBtn.setId("backBtn");
         backBtn.setOnAction(NewProjectLayoutListener.getInstance());
