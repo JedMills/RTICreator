@@ -416,4 +416,11 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
         return new int[]{x, y, width, height};
     }
+
+
+    public String getImagesFormat(){
+        String imageName = lpImagesGrid.getGridTiles()[0].getName().toLowerCase();
+
+        return imageName.substring(imageName.length() - 3);
+    }
 }

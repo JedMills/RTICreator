@@ -80,8 +80,6 @@ public class Utils {
             throw new LPException("File did not contain number of images on line 1.");
         }
 
-
-
         HashMap<String, Vector3f> lpData = new HashMap<>();
         int numLPData = 0;
         line = reader.readLine();
@@ -124,7 +122,21 @@ public class Utils {
 
 
 
+    public static class BooleanHolder{
+        private boolean b;
 
+        public BooleanHolder(boolean b) {
+            this.b = b;
+        }
+
+        public boolean isB() {
+            return b;
+        }
+
+        public void setB(boolean b) {
+            this.b = b;
+        }
+    }
 
 
 

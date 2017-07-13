@@ -170,6 +170,7 @@ public class Main extends Application {
             @Override
             public void run() {
                 loadingDialog.show();
+                loadingDialog.bringToFront();
             }
         });
     }
@@ -233,6 +234,10 @@ public class Main extends Application {
 
         public void setText(String text) {
             this.label.setText(text);
+        }
+
+        public void bringToFront(){
+            stage.toFront();
         }
     }
 }
