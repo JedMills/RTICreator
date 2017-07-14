@@ -144,7 +144,6 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             fitterArgs += destinationFileName;
         }
 
-
         try {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(fitterArgs);
@@ -157,16 +156,18 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
                     InputStreamReader(process.getErrorStream()));
 
             // read the output from the command
-            System.out.println("Here is the standard output of the command:\n");
             String s = null;
             while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
+                if(cropExecuteLayout.ptmSelected() && (!s.startsWith("Processing row"))) {
+                    cropExecuteLayout.printToFitterOutput(s);
+                }
             }
 
             // read any errors from the attempted command
-            System.out.println("Here is the standard error of the command (if any):\n");
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                if(!s.matches("\\d+")) {
+                    cropExecuteLayout.printToFitterOutput(s);
+                }
             }
         }catch (IOException e){
             e.printStackTrace();

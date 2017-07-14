@@ -2,6 +2,7 @@ package cropExecuteScene;
 
 import guiComponents.ImageGridTile;
 import guiComponents.ScrollableImageGridForCrop;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -70,7 +71,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         imageCropPane.changeColour(ImageCropPane.Colour.BLUE);
         hshButton.setSelected(true);
 
-        //imageCropPane.setImage(new Image("images/fish_fossil_01.jpg"));
     }
 
 
@@ -140,7 +140,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             Label fitterLocLabel = new Label("Fitter location:");
             GridPane.setConstraints(fitterLocLabel, 0, 0);
             fitterLocationField = new TextField();
-            fitterLocationField.setEditable(false);
+            fitterLocationField.setEditable(true);
             GridPane.setConstraints(fitterLocationField, 1, 0);
             fitterLocationButton = new Button("Browse");
             fitterLocationButton.setId("browseFitterLocation");
@@ -150,7 +150,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             Label outLocLabel = new Label("Output file:");
             GridPane.setConstraints(outLocLabel, 0, 1);
             outputLocationField = new TextField();
-            outputLocationField.setEditable(false);
+            outputLocationField.setEditable(true);
             GridPane.setConstraints(outputLocationField, 1, 1);
             outputLocationButton = new Button("Browse");
             outputLocationButton.setId("browseOutputLocation");
@@ -170,6 +170,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             Label fitterOutLabel = new Label("Fitter Output:");
             fitterOutLabel.setPadding(new Insets(0, 5, 5,5));
             fitterOutputArea = new TextArea();
+            fitterOutputArea.setEditable(false);
             fitterOutputArea.setMinHeight(10);
             fitterOutputArea.setMinWidth(10);
             fitterOutputArea.setMaxWidth(320);
@@ -250,7 +251,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         ColumnConstraints column3 = new ColumnConstraints();
         column3.setPercentWidth(33.33);
 
-        //gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.getColumnConstraints().addAll(column1, column2, column3);
 
@@ -524,5 +524,16 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         imageCropPane.clearImage();
         useCropCheckBox.setSelected(false);
         useCrop = false;
+    }
+
+    public void printToFitterOutput(String line){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                fitterOutputArea.setText(fitterOutputArea.getText() +
+                                            System.lineSeparator() +
+                                            line);
+            }
+        });
     }
 }
