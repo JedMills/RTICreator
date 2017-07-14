@@ -1,30 +1,20 @@
 package cropExecuteScene;
 
 import guiComponents.ImageGridTile;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.value.WritableBooleanValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.stage.FileChooser;
 import main.Main;
 import utils.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
@@ -55,13 +45,21 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
                 if(!checkFitterInputs()){ return; }
 
-                runFitter();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runFitter();
+                    }
+                }).start();
 
             }else if(source.getId().equals("browseFitterLocation")){
                 browseFitterLocation();
 
             }else if(source.getId().equals("browseOutputLocation")){
                 browseOutputLocation();
+
+            }else if(source.getId().equals("backButton")){
+                Main.backButtonPressed(cropExecuteLayout);
 
             }
 
@@ -93,11 +91,15 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
 
     private boolean checkFitterInputs(){
-        String fitterLoc = cropExecuteLayout.getFitterLocation();
-        String outLoc = cropExecuteLayout.getOutputLocation();
+        TextField fitterField = cropExecuteLayout.getFitterLocationField();
+        TextField outputField = cropExecuteLayout.getOutputLocationField();
 
-        if(fitterLoc.equals("") || outLoc.equals("")){
+        if(Utils.haveEmptyField(fitterField, outputField)){
             Main.showInputAlert("Please select locations of the fitter program and output destination");
+            return false;
+
+        }else if(Utils.containsSpaces(fitterField, outputField)){
+            Main.showInputAlert("Please ensure there are no spaces in the paths to the fitter and output file.");
             return false;
         }
 
@@ -110,27 +112,77 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         File lpFile = null;
         if(cropExecuteLayout.isUseCrop()){
             lpFile = cropAndCreateLPFile();
-
         }else if(!cropExecuteLayout.getImagesFormat().equals("jpg")){
             lpFile = convertImagesAndCreateLPFile();
-
         }else{
             lpFile = createLPFileJPEGNoCrop();
-
         }
 
-        String fitterLoction = cropExecuteLayout.getFitterLocation();
+        Main.showLoadingDialog("Running fitter...");
+
+        String fitterLocation = cropExecuteLayout.getFitterLocation();
         String lpFileLocation = lpFile.getAbsolutePath();
+        String destinationFileName = cropExecuteLayout.getOutputLocation();
+
+        String fitterArgs = fitterLocation + " ";
+
+
+        if(cropExecuteLayout.ptmSelected()){
+            fitterArgs += "-i " + lpFileLocation;
+            fitterArgs += " -o " + destinationFileName;
+
+            if(cropExecuteLayout.ptmRGBSelected()){
+                fitterArgs += " -f 0 ";
+            }
+            else if(cropExecuteLayout.ptmLRGBSelected()){
+                fitterArgs += " -f 1 ";
+            }
+
+        }else if(cropExecuteLayout.hshSelected()){
+            fitterArgs += lpFileLocation + " ";
+            fitterArgs += String.valueOf(cropExecuteLayout.getHSHOrder()) + " ";
+            fitterArgs += destinationFileName;
+        }
+
+
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(fitterArgs);
+
+
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(process.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(process.getErrorStream()));
+
+            // read the output from the command
+            System.out.println("Here is the standard output of the command:\n");
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+            }
+
+            // read any errors from the attempted command
+            System.out.println("Here is the standard error of the command (if any):\n");
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            Main.hideLoadingDialog();
+            Main.showFileReadingAlert("Error running fitter executable. See fitter output pane.");
+        }
+
+        Main.hideLoadingDialog();
     }
 
 
 
     private File createLPFileJPEGNoCrop(){
-        System.out.println("Creating LP File JPEG no crop...");
-        System.out.println(Main.currentImagesFolder.getAbsolutePath());
         return createNewLPFile(Main.currentAssemblyFolder.getAbsolutePath(),
                                 "_default" + ".lp",
-                                true, null);
+                                true, null, true);
     }
 
 
@@ -140,7 +192,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
     private File convertImagesAndCreateLPFile(){
         Main.showLoadingDialog("Converting images...");
         final String convertedFolderLocation = Main.currentAssemblyFolder.getAbsolutePath() +
-                "/" + Main.currentRTIProjct.getName() + "_convertedJPEGS";
+                "/" + Main.currentRTIProject.getName() + "_convertedJPEGS";
         File convertedFolder = new File(convertedFolderLocation);
 
         if(!convertedFolder.exists()){ convertedFolder.mkdir(); }
@@ -170,7 +222,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             return null;
         }
 
-        return createNewLPFile(convertedFolderLocation, "_converted.lp", false, ".jpg");
+        return createNewLPFile(convertedFolderLocation, "_converted.lp", false, ".jpg", false);
 
     }
 
@@ -179,7 +231,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
     private File cropAndCreateLPFile(){
         Main.showLoadingDialog("Cropping images...");
         final String croppedFolderLocation = Main.currentAssemblyFolder.getAbsolutePath() +
-                "/" + Main.currentRTIProjct.getName() + "_croppedFiles";
+                "/" + Main.currentRTIProject.getName() + "_croppedFiles";
         File croppedFolder = new File(croppedFolderLocation);
 
         if(!croppedFolder.exists()){ croppedFolder.mkdir(); }
@@ -225,16 +277,16 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         }
 
         if(areJPEGS.isB()) {
-            return createNewLPFile(croppedFolderLocation, "_cropped.lp", true, null);
+            return createNewLPFile(croppedFolderLocation, "_cropped.lp", true, null, false);
         }else{
-            return createNewLPFile(croppedFolderLocation, "_cropped.lp", false, ".jpg");
+            return createNewLPFile(croppedFolderLocation, "_cropped.lp", false, ".jpg", false);
         }
     }
 
 
-    private File createNewLPFile(String parentDirLoc, String lpFileName, boolean useOriginalImgExt, String newExt){
+    private File createNewLPFile(String parentDirLoc, String lpFileName, boolean useOriginalImgExt, String newExt, boolean uncroppedJPEGs){
         File newLPFile = new File(parentDirLoc + "/" +
-                Main.currentRTIProjct.getName() + lpFileName);
+                Main.currentRTIProject.getName() + lpFileName);
 
         Main.showLoadingDialog("Creating new LP file...");
 
@@ -251,8 +303,13 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             for(String key : originalLPData.keySet()){
                 originalImageFile = new File(key);
 
-                if(useOriginalImgExt){ name = parentDirLoc + "/" + originalImageFile.getName(); }
-                else{
+                if(uncroppedJPEGs){
+                  name = Main.currentImagesFolder.getAbsolutePath() + "/" + originalImageFile.getName();
+
+                } else if(useOriginalImgExt){
+                    name = parentDirLoc + "/" + originalImageFile.getName();
+
+                } else{
                     name = parentDirLoc + "/" + originalImageFile.getName().split("[.]")[0] + newExt;
                 }
 
@@ -314,6 +371,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
 
     private void browseFitterLocation(){
+        Main.fileChooser.getExtensionFilters().clear();
         if(cropExecuteLayout.ptmSelected()){
             Main.fileChooser.setTitle("Select PTM Fitter");
         }else{
@@ -328,10 +386,17 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
 
     private void browseOutputLocation(){
+        Main.fileChooser.getExtensionFilters().clear();
         if(cropExecuteLayout.ptmSelected()){
             Main.fileChooser.setTitle("Select Destination For PTM");
+            Main.fileChooser.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Poly Texture Map File (.ptm)",
+                                                                ".ptm"));
         }else{
             Main.fileChooser.setTitle("Select Destination For HSH");
+            Main.fileChooser.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Reflectance Transformation Imaging File (.rti)",
+                                                            ".rti"));
         }
 
         File dest = Main.fileChooser.showSaveDialog(Main.primaryStage);

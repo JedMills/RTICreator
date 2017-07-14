@@ -33,6 +33,8 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private CheckBox useCropCheckBox;
     private ComboBox<ImageCropPane.Colour> cropColourSelector;
 
+    private GridPane fitterOptionsGrid;
+    private Label fitterTypeLabel;
 
     private TextField fitterLocationField;
     private Button fitterLocationButton;
@@ -43,10 +45,8 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private RadioButton hshButton;
     private RadioButton ptmRGBButton;
     private RadioButton ptmLRGBButton;
-    private RadioButton hshTerms1;
     private RadioButton hshTerms2;
     private RadioButton hshTerms3;
-    private HBox fitterOptionsBox;
     private Label ptmTypeLabel;
     private Label hshTermsLabel;
 
@@ -133,6 +133,9 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         Label fitterPaneTitle = new Label("RTI Fitter Options");
         fitterPaneTitle.setFont(Font.font(null, FontWeight.BOLD, 12));
 
+        fitterOptionsGrid = createFitterOptionsGrid();
+
+
         GridPane fitterOutLocPane = new GridPane();
             Label fitterLocLabel = new Label("Fitter location:");
             GridPane.setConstraints(fitterLocLabel, 0, 0);
@@ -160,50 +163,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
                                                 outLocLabel, outputLocationField, outputLocationButton);
 
 
-        HBox fitterTypeBox = new HBox();
-        fitterTypeBox.setId("fitterTypeBox");
-        Label fitterTypeLabel = new Label("Fitter type:");
-        ToggleGroup fitterTypeToggle = new ToggleGroup();
-        ptmButton = new RadioButton("PTM");
-        ptmButton.setId("ptmButton");
-        ptmButton.setOnAction(CropExecuteLayoutListener.getInstance());
-        ptmButton.setToggleGroup(fitterTypeToggle);
-        hshButton = new RadioButton("HSH");
-        hshButton.setId("hshButton");
-        hshButton.setOnAction(CropExecuteLayoutListener.getInstance());
-        hshButton.setToggleGroup(fitterTypeToggle);
-        fitterTypeBox.getChildren().addAll(fitterTypeLabel, createSpacer(), ptmButton, createSpacer(), hshButton, createSpacer());
-        fitterTypeBox.setPadding(new Insets(5, 5, 5, 5));
-
-        fitterOptionsBox = new HBox();
-        fitterOptionsBox.setId("fitterOptionsBox");
-        ptmTypeLabel = new Label("PTM type:");
-        ptmTypeLabel.setMinWidth(fitterTypeLabel.getWidth());
-        ToggleGroup ptmTypeToggle = new ToggleGroup();
-        ptmRGBButton = new RadioButton("RGB");
-        ptmRGBButton.setId("rgbPTMButton");
-        ptmRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
-        ptmRGBButton.setToggleGroup(ptmTypeToggle);
-        ptmLRGBButton = new RadioButton("LRGB");
-        ptmLRGBButton.setId("lrgbPTMButton");
-        ptmLRGBButton.setSelected(true);
-        ptmLRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
-        ptmLRGBButton.setToggleGroup(ptmTypeToggle);
-        fitterOptionsBox.setAlignment(Pos.CENTER);
-
-        hshTermsLabel = new Label("HSH Terms:");
-        ToggleGroup hshToggleGroup = new ToggleGroup();
-        hshTerms1 = new RadioButton("1");
-        hshTerms1.setToggleGroup(hshToggleGroup);
-        hshTerms2 = new RadioButton("2");
-        hshTerms2.setToggleGroup(hshToggleGroup);
-        hshTerms3 = new RadioButton("3");
-        hshTerms3.setToggleGroup(hshToggleGroup);
-
-        fitterOptionsBox.setPadding(new Insets(5, 5, 5, 5));
-        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTerms1, createSpacer(),
-                                                hshTerms2, createSpacer(), hshTerms3, createSpacer());
-        hshTerms2.setSelected(true);
 
 
 
@@ -221,10 +180,82 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         vBox.setSpacing(5);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
-        vBox.getChildren().addAll(fitterPaneTitle, fitterTypeBox, fitterOptionsBox, fitterOutLocPane, fitterOutputBox);
+        vBox.getChildren().addAll(fitterPaneTitle, fitterOptionsGrid, fitterOutLocPane, fitterOutputBox);
         return vBox;
     }
 
+
+
+    private GridPane createFitterOptionsGrid(){
+        GridPane gridPane = new GridPane();
+
+        fitterTypeLabel = new Label("Fitter type:");
+        GridPane.setConstraints(fitterTypeLabel, 0, 0);
+
+        ToggleGroup fitterTypeToggle = new ToggleGroup();
+        ptmButton = new RadioButton("PTM");
+        ptmButton.setId("ptmButton");
+        ptmButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmButton.setToggleGroup(fitterTypeToggle);
+        GridPane.setConstraints(ptmButton, 1, 0);
+
+        hshButton = new RadioButton("HSH");
+        hshButton.setId("hshButton");
+        hshButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        hshButton.setToggleGroup(fitterTypeToggle);
+        GridPane.setConstraints(hshButton, 2, 0);
+
+        ptmTypeLabel = new Label("PTM type:");
+        GridPane.setConstraints(ptmTypeLabel, 0, 1);
+
+        ToggleGroup ptmTypeToggle = new ToggleGroup();
+        ptmRGBButton = new RadioButton("RGB");
+        ptmRGBButton.setId("rgbPTMButton");
+        ptmRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmRGBButton.setToggleGroup(ptmTypeToggle);
+        GridPane.setConstraints(ptmRGBButton, 1, 1);
+
+
+        ptmLRGBButton = new RadioButton("LRGB");
+        ptmLRGBButton.setId("lrgbPTMButton");
+        ptmLRGBButton.setSelected(true);
+        ptmLRGBButton.setOnAction(CropExecuteLayoutListener.getInstance());
+        ptmLRGBButton.setToggleGroup(ptmTypeToggle);
+        GridPane.setConstraints(ptmLRGBButton, 2, 1);
+
+        hshTermsLabel = new Label("HSH Terms:");
+        GridPane.setConstraints(hshTermsLabel, 0, 1);
+
+        ToggleGroup hshToggleGroup = new ToggleGroup();
+        hshTerms2 = new RadioButton("2");
+        hshTerms2.setToggleGroup(hshToggleGroup);
+        GridPane.setConstraints(hshTerms2, 1, 1);
+
+        hshTerms3 = new RadioButton("3");
+        hshTerms3.setToggleGroup(hshToggleGroup);
+        GridPane.setConstraints(hshTerms3, 2, 1);
+
+        hshTerms2.setSelected(true);
+
+        gridPane.getChildren().addAll(fitterTypeLabel, ptmButton, hshButton);
+        gridPane.getChildren().addAll(hshTermsLabel, hshTerms2, hshTerms3);
+
+        gridPane.setAlignment(Pos.CENTER_LEFT);
+        gridPane.setPadding(new Insets(5, 5, 5, 5));
+
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(33.33);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(33.33);
+        ColumnConstraints column3 = new ColumnConstraints();
+        column3.setPercentWidth(33.33);
+
+        //gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.getColumnConstraints().addAll(column1, column2, column3);
+
+        return gridPane;
+    }
 
 
 
@@ -330,7 +361,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         HBox hBox = new HBox();
         hBox.getStyleClass().add("bottomBar");
         backButton = new Button("< Back");
-        backButton.setId("backBtn");
+        backButton.setId("backButton");
         backButton.setOnAction(CropExecuteLayoutListener.getInstance());
 
         runFitterButton = new Button("Run Fitter");
@@ -407,15 +438,15 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     }
 
     public void setPTMOptions(){
-        fitterOptionsBox.getChildren().clear();
-        fitterOptionsBox.getChildren().addAll(ptmTypeLabel, createSpacer(), ptmRGBButton,
-                                            createSpacer(), ptmLRGBButton, createSpacer());
+        fitterOptionsGrid.getChildren().clear();
+        fitterOptionsGrid.getChildren().addAll(fitterTypeLabel, ptmButton, hshButton);
+        fitterOptionsGrid.getChildren().addAll(ptmTypeLabel, ptmRGBButton, ptmLRGBButton);
     }
 
     public void setHSHOptions(){
-        fitterOptionsBox.getChildren().clear();
-        fitterOptionsBox.getChildren().addAll(hshTermsLabel, createSpacer(), hshTerms1, createSpacer(),
-                hshTerms2, createSpacer(), hshTerms3, createSpacer());
+        fitterOptionsGrid.getChildren().clear();
+        fitterOptionsGrid.getChildren().addAll(fitterTypeLabel, ptmButton, hshButton);
+        fitterOptionsGrid.getChildren().addAll(hshTermsLabel, hshTerms2, hshTerms3);
     }
 
     public boolean isUseCrop() {
@@ -467,4 +498,31 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         return hshButton.isSelected();
     }
 
+    public boolean ptmRGBSelected(){return ptmRGBButton.isSelected();}
+
+    public boolean ptmLRGBSelected(){return ptmLRGBButton.isSelected();}
+
+    public int getHSHOrder(){
+        if(hshTerms2.isSelected())     { return 2; }
+        else if(hshTerms3.isSelected()){ return 3; }
+
+        return -1;
+    }
+
+
+    public TextField getFitterLocationField() {
+        return fitterLocationField;
+    }
+
+    public TextField getOutputLocationField() {
+        return outputLocationField;
+    }
+
+
+    public void resetScene(){
+        lpImagesGrid.clearTiles();
+        imageCropPane.clearImage();
+        useCropCheckBox.setSelected(false);
+        useCrop = false;
+    }
 }

@@ -19,6 +19,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import main.Main;
+import utils.Utils;
 
 import java.io.File;
 
@@ -284,27 +285,20 @@ public class LoadProjRsrcsDialog {
         cancelButtonLP.setOnAction(close);
         cancelButtonHL.setOnAction(close);
 
-        okButtonHL.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldHL, assemblyLocationFieldHL}));
-        okButtonLP.setOnAction(createOKButtonHandler(new TextField[]{imgLocationFieldLP, lpLocationField, assemblyLocationFieldLP}));
+        okButtonHL.setOnAction(createOKButtonHandler(imgLocationFieldHL, assemblyLocationFieldHL));
+        okButtonLP.setOnAction(createOKButtonHandler(imgLocationFieldLP, lpLocationField, assemblyLocationFieldLP));
     }
 
 
-    private EventHandler<ActionEvent> createOKButtonHandler(TextField[] fields){
+    private EventHandler<ActionEvent> createOKButtonHandler(TextField... fields){
         EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                boolean allSet = true;
-                for(TextField textField : fields){
-                    if(textField.getText().equals("")){allSet = false;}
-                }
-                if(!allSet){
-                    Main.inputAlert.setContentText("Please select all fields.");
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            Main.inputAlert.showAndWait();
-                        }
-                    });
+                if(Utils.haveEmptyField(fields)){
+                    Main.showInputAlert("Please select all fields.");
+
+                }else if(Utils.containsSpaces(fields)){
+                    Main.showInputAlert("Please ensure there are no spaces in the file paths provided.");
 
                 }else{
                     if(fields.length == 2) {
@@ -313,8 +307,8 @@ public class LoadProjRsrcsDialog {
                         newProjectLayout.setResources(imgLocationFieldLP.getText(),
                                 lpLocationField.getText(), assemblyLocationFieldLP.getText());
                     }
+                    stage.close();
                 }
-                stage.close();
             }
         };
 

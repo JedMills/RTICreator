@@ -6,8 +6,7 @@ package main;
 public enum ProjectType {
 
     HIGHLIGHT   ("Highlight based"),
-    DOME_LP     ("Dome LP file"),
-    LP          ("LP file");
+    DOME_LP     ("Dome LP file");
 
     private String label;
 

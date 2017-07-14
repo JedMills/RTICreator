@@ -1,5 +1,6 @@
 package utils;
 
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
@@ -118,6 +119,35 @@ public class Utils {
 
         reader.close();
         return lpData;
+    }
+
+
+
+    public static boolean containsSpaces(String... strings){
+        for(String s : strings){
+            if(s.contains(" ")){return false;}
+        }
+        return false;
+    }
+
+
+    public static boolean containsSpaces(TextField... textFields){
+        for(TextField field : textFields){
+            if(field.getText().contains(" ")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static boolean haveEmptyField(TextField... textFields){
+        for(TextField field : textFields){
+            if(field.getText().equals("")){
+                return true;
+            }
+        }
+        return false;
     }
 
 

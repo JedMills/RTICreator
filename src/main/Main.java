@@ -38,8 +38,9 @@ public class Main extends Application {
     public static DirectoryChooser directoryChooser;
     public static Alert fileReadingAlert;
     private static LoadingDialog loadingDialog;
+    public static Alert successAlert;
 
-    public static RTIProject currentRTIProjct;
+    public static RTIProject currentRTIProject;
     public static File currentImagesFolder;
     public static File currentAssemblyFolder;
     public static File currentLPFile;
@@ -115,6 +116,10 @@ public class Main extends Application {
         fileReadingAlert.setHeaderText("");
 
         loadingDialog = new LoadingDialog();
+
+        successAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        successAlert.setTitle("Success");
+        successAlert.setHeaderText("");
     }
 
 
@@ -133,14 +138,11 @@ public class Main extends Application {
 
 
     public static void changeToNewProjLayout(RTIProject rtiProject){
-        currentRTIProjct = rtiProject;
+        currentRTIProject = rtiProject;
         NewProjectLayout.getInstance().setProject(rtiProject);
         setCreatorStage(newProjScene, NewProjectLayout.getInstance());
     }
 
-    public static void changeToInitialLayout(){
-        setCreatorStage(initialScene, InitialLayout.getInstance());
-    }
 
 
     public static void changeToCropExecuteScene(ArrayList<ImageGridTile> approvedTiles){
@@ -193,6 +195,37 @@ public class Main extends Application {
         });
     }
 
+    public static void showSuccessAlert(String text){
+        successAlert.setContentText(text);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                successAlert.show();
+            }
+        });
+    }
+
+
+    public static void backButtonPressed(CreatorScene currentScene){
+        if(currentScene == NewProjectLayout.getInstance()){
+            setCreatorStage(initialScene, InitialLayout.getInstance());
+            NewProjectLayout.getInstance().resetScene();
+
+        }else if(currentScene == CropExecuteLayout.getInstance()){
+            if(currentRTIProject.getProjectType().equals(ProjectType.DOME_LP)){
+                setCreatorStage(newProjScene, NewProjectLayout.getInstance());
+                CropExecuteLayout.getInstance().resetScene();
+
+            }else if(currentRTIProject.getProjectType().equals(ProjectType.HIGHLIGHT)){
+
+
+            }
+
+
+        }
+    }
+
+
 
     private static class LoadingDialog{
 
@@ -232,7 +265,12 @@ public class Main extends Application {
         }
 
         public void setText(String text) {
-            this.label.setText(text);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    LoadingDialog.this.label.setText(text);
+                }
+            });
         }
 
         public void bringToFront(){

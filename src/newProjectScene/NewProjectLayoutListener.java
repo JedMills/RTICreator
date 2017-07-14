@@ -70,17 +70,13 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 }
 
             }else if(source.getId().equals("backBtn")){
-                Main.changeToInitialLayout();
-                newProjectLayout.resetScene();
+                Main.backButtonPressed(newProjectLayout);
 
             }else if(source.getId().equals("nextBtn")){
                 if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP)){
                     moveSceneDomePTM();
 
                 }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
-                    System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
-
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.LP)){
                     System.out.println("Not yet implemented: " + newProjectLayout.getProjectType().toString());
 
                 }

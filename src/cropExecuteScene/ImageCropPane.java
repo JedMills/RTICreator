@@ -92,6 +92,11 @@ public class ImageCropPane extends BorderPane{
         imageView.setImage(image);
     }
 
+    public void clearImage(){
+        this.image = null;
+        imageView.setImage(null);
+    }
+
     public void setCropActive(boolean cropActive) {
         this.cropActive = cropActive;
 
