@@ -468,8 +468,10 @@ public class NewProjectLayout extends VBox implements CreatorScene{
                     lpData = Utils.readLPFile(lpFile);
                     setResources(imgsLocation, assemblyFilesLocation);
                 }catch(IOException e){
+                    e.printStackTrace();
                     Main.showFileReadingAlert("Error accessing LP file at: " + lpLocation);
                 }catch(Utils.LPException e){
+                    e.printStackTrace();
                     Main.showFileReadingAlert("Error parsing LP file at: " + lpLocation +
                                                                                 ", " + e.getMessage());
                 }

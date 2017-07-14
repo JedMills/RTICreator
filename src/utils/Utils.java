@@ -103,13 +103,13 @@ public class Utils {
 
             lineItems = line.split("\\s+");
 
-
             try{
                 fileName = lineItems[0];
                 lightX = Float.parseFloat(lineItems[1]);
                 lightY = Float.parseFloat(lineItems[2]);
                 lightZ = Float.parseFloat(lineItems[3]);
             }catch(NumberFormatException|IndexOutOfBoundsException e){
+                e.printStackTrace();
                 throw new LPException("Error parsing lp data on line: " + currentLine);
             }
 
