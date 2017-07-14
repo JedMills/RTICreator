@@ -1,5 +1,5 @@
-#initialLayoutOptionsBox, #initialLayoutHBox, GridPane, .projectPropertiesPane, .bottomBar,
-#openBtnBox, #removePicPane, #fitterPane, #cropExecLayoutCropOptions, #fitterTypeBox, #fitterOptionsBox{
+GridPane, .projectPropertiesPane, .bottomBar, #openBtnBox, #removePicPane, #fitterPane,
+#cropExecLayoutCropOptions, #fitterTypeBox, #fitterOptionsBox, .defaultBorder{
     -fx-border-color: #dddddd;
     -fx-border-radius: 5;
 }
@@ -54,6 +54,6 @@ TilePane{
     -fx-border-radius: 5;
 }
 
-#cropExecLayoutCropOptions HBox, #cropExecLayoutCropOptions GridPane{
+#cropExecLayoutCropOptions HBox, #cropExecLayoutCropOptions GridPane, .noBorderClass{
     -fx-border-color: transparent;
 }

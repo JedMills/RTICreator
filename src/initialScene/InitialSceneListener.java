@@ -23,8 +23,7 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
         return ourInstance;
     }
 
-    private InitialSceneListener() {
-    }
+    private InitialSceneListener() {}
 
     public void init(InitialLayout initialLayout){
         this.initialLayout = initialLayout;

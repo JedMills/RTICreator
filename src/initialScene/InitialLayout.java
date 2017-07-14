@@ -49,7 +49,7 @@ public class InitialLayout extends VBox implements CreatorScene {
 
 
         VBox projectOptionsContainer = new VBox();
-        projectOptionsContainer.setId("initialLayoutOptionsBox");
+        projectOptionsContainer.getStyleClass().add("defaultBorder");
         projectOptionsContainer.setPadding(new Insets(10 , 10 ,10, 10));
 
         HBox nameHBox = new HBox();
@@ -80,7 +80,7 @@ public class InitialLayout extends VBox implements CreatorScene {
         projectOptionsContainer.getChildren().addAll(nameHBox, projTypeBox);
 
         HBox hBox = new HBox();
-        hBox.setId("initialLayoutHBox");
+        hBox.getStyleClass().add("defaultBorder");
 
 
         startNewProjectBtn = new Button("Start new project");

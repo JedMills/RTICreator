@@ -1,5 +1,6 @@
 package cropExecuteScene;
 
+import guiComponents.ImageCropPane;
 import guiComponents.ImageGridTile;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -204,7 +205,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         gridTileSet.parallelStream().forEach(new Consumer<ImageGridTile>() {
             @Override
             public void accept(ImageGridTile tile) {
-                BufferedImage jpgImg = fxImageToBufferedJPEG(tile.getImage());
+                BufferedImage jpgImg = Utils.fxImageToBufferedJPEG(tile.getImage());
                 String tileNameNoExt = tile.getName().split("[.]")[0];
                 File destination = new File(convertedFolder.getAbsolutePath() + "/" + tileNameNoExt + ".jpg");
 
@@ -252,7 +253,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             public void accept(ImageGridTile tile) {
                 Image croppedImage = Utils.cropImage(tile.getImage(), cropParams[0],
                         cropParams[1], cropParams[2], cropParams[3]);
-                BufferedImage newImg = fxImageToBufferedJPEG(croppedImage);
+                BufferedImage newImg = Utils.fxImageToBufferedJPEG(croppedImage);
 
                 File destination;
                 if(areJPEGS.isB()) {
@@ -282,6 +283,9 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
             return createNewLPFile(croppedFolderLocation, "_cropped.lp", false, ".jpg", false);
         }
     }
+
+
+
 
 
     private File createNewLPFile(String parentDirLoc, String lpFileName, boolean useOriginalImgExt, String newExt, boolean uncroppedJPEGs){
@@ -354,18 +358,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
 
 
-    private BufferedImage fxImageToBufferedJPEG(Image image){
-        BufferedImage bufImg = SwingFXUtils.fromFXImage(image, null);
-        BufferedImage newImg = new BufferedImage(bufImg.getWidth(), bufImg.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-        for(int x = 0; x < bufImg.getWidth(); x++){
-            for(int y = 0; y < bufImg.getHeight(); y++){
-                newImg.setRGB(x, y, bufImg.getRGB(x, y));
-            }
-        }
-
-        return newImg;
-    }
 
 
 

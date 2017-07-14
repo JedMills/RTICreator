@@ -1,8 +1,5 @@
 package guiComponents;
 
-import cropExecuteScene.ImageCropPane;
-import javafx.scene.image.ImageView;
-
 /**
  * Created by Jed on 11-Jul-17.
  */

@@ -579,8 +579,8 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         return lpFile;
     }
 
-    public Image[] getSelectedImages(){
-        return selectedImages.getAllImages();
+    public ScrollableImageGrid getSelectedImages(){
+        return selectedImages;
     }
 
     public ArrayList<ImageGridTile> getSelectedImages(ArrayList<String> filter){
@@ -593,5 +593,12 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         }
         return tiles;
     }
+
+    public String getImagesExtension(){
+        String s = selectedImages.getGridTiles()[0].getName().split("[.]")[1].toLowerCase();
+        System.out.println(s);
+        return s;
+    }
+
 
 }

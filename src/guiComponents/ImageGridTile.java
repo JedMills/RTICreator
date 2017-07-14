@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
@@ -15,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -29,13 +31,14 @@ public class ImageGridTile extends VBox {
     private String name;
     private int width;
     private int height;
-    private boolean tickBox;
+    private boolean hasTickBox;
     private boolean clickable;
     private BorderPane borderPane;
     private ImageView imageView;
     private ScrollableImageGrid parent;
     private String rejectComment;
     private Tooltip tooltip;
+    private CheckBox checkBox;
 
     private static PseudoClass TILE_SELECTED_CLASS = PseudoClass.getPseudoClass("selected");
 
@@ -60,12 +63,12 @@ public class ImageGridTile extends VBox {
 
 
     public ImageGridTile(ScrollableImageGrid parent, String name, Image image, int width,
-                                            int height, boolean tickBox, boolean clickable, boolean preview){
+                                            int height, boolean hasTickBox, boolean clickable, boolean preview){
         this.parent = parent;
         this.name = name;
         this.width = width;
         this.height = height;
-        this.tickBox = tickBox;
+        this.hasTickBox = hasTickBox;
         this.clickable = clickable;
 
         tooltip = new Tooltip();
@@ -96,7 +99,17 @@ public class ImageGridTile extends VBox {
 
         Label label = new Label(name);
         label.setPadding(new Insets(2, 2, 2, 2));
-        getChildren().addAll(borderPane, label);
+        HBox labelBox = new HBox();
+        labelBox.setAlignment(Pos.CENTER);
+
+        if(hasTickBox){
+            checkBox = new CheckBox();
+            labelBox.getChildren().addAll(checkBox, label);
+        }else{
+            labelBox.getChildren().add(label);
+
+        }
+        getChildren().addAll(borderPane, labelBox);
         setAlignment(Pos.TOP_CENTER);
 
         setPadding(new Insets(5, 5, 5, 5));
@@ -176,5 +189,13 @@ public class ImageGridTile extends VBox {
 
     public String getName() {
         return name;
+    }
+
+    public int getTileWidth() {
+        return width;
+    }
+
+    public int getTileHeight() {
+        return height;
     }
 }

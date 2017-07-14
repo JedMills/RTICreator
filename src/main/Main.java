@@ -2,6 +2,7 @@ package main;
 
 import cropExecuteScene.CropExecuteLayout;
 import guiComponents.ImageGridTile;
+import highlightDetectionScene.HighlightDetectionLayout;
 import initialScene.InitialLayout;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -48,6 +49,7 @@ public class Main extends Application {
     private static Scene initialScene;
     private static Scene newProjScene;
     private static Scene cropExecuteScene;
+    private static Scene highlightDetectionScene;
 
     public static final Image thumbnail = new Image("images/rtiThumbnail.png");
 
@@ -63,6 +65,7 @@ public class Main extends Application {
 
         setCreatorStage(initialScene, InitialLayout.getInstance());
         //setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
+        //setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -99,6 +102,7 @@ public class Main extends Application {
         initialScene = new Scene(InitialLayout.getInstance());
         newProjScene = new Scene(NewProjectLayout.getInstance());
         cropExecuteScene = new Scene(CropExecuteLayout.getInstance());
+        highlightDetectionScene = new Scene(HighlightDetectionLayout.getInstance());
     }
 
 
@@ -223,6 +227,17 @@ public class Main extends Application {
 
 
         }
+    }
+
+
+    public static void changeToHighlightDetectionScene(ArrayList<ImageGridTile> tilesToCopy, File selectedImagesFile){
+        HighlightDetectionLayout.getInstance().setTiles(tilesToCopy);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
+            }
+        });
     }
 
 

@@ -1,15 +1,16 @@
 package cropExecuteScene;
 
+import guiComponents.ImageCropPane;
 import guiComponents.ImageGridTile;
 import guiComponents.ScrollableImageGridForCrop;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import main.CreatorScene;
+import utils.Utils;
 
 import java.util.ArrayList;
 
@@ -70,7 +71,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         imageCropPane.changeColour(ImageCropPane.Colour.BLUE);
         hshButton.setSelected(true);
 
-        //imageCropPane.setImage(new Image("images/fish_fossil_01.jpg"));
     }
 
 
@@ -250,7 +250,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         ColumnConstraints column3 = new ColumnConstraints();
         column3.setPercentWidth(33.33);
 
-        //gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.getColumnConstraints().addAll(column1, column2, column3);
 
@@ -265,7 +264,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             imageCropPane = new ImageCropPane(cropWidthField, cropHeightField);
             imageCropPane.setId("cropExecutePanePreview");
             imageCropPane.setStyle("-fx-background-color: #000000;");
-            imageCropPane.prefHeightProperty().bind(cropPane.heightProperty());
             imageCropPane.setMinWidth(0);
             imageCropPane.setMinHeight(0);
             imageCropPane.prefWidthProperty().bind(cropPane.widthProperty());
@@ -343,18 +341,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
 
 
-    private Pane createSpacer(){
-        Pane spacer = new Pane();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        spacer.setMinSize(1, 1);
-        return spacer;
-    }
 
-    private Pane createSpacer(int maxWidth){
-        Pane spacer = createSpacer();
-        spacer.setMaxWidth(maxWidth);
-        return spacer;
-    }
 
 
     private HBox createBottomBar(){
@@ -368,7 +355,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         runFitterButton.setId("runFitterButton");
         runFitterButton.setOnAction(CropExecuteLayoutListener.getInstance());
 
-        Pane spacer = createSpacer();
+        Pane spacer = Utils.createSpacer();
 
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(backButton, spacer, runFitterButton);

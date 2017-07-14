@@ -1,11 +1,16 @@
 package utils;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import main.ProjectType;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -166,6 +171,34 @@ public class Utils {
         public void setB(boolean b) {
             this.b = b;
         }
+    }
+
+
+    public static Pane createSpacer(){
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        spacer.setMinSize(1, 1);
+        return spacer;
+    }
+
+    public static Pane createSpacer(int maxWidth){
+        Pane spacer = createSpacer();
+        spacer.setMaxWidth(maxWidth);
+        return spacer;
+    }
+
+
+    public static BufferedImage fxImageToBufferedJPEG(Image image){
+        BufferedImage bufImg = SwingFXUtils.fromFXImage(image, null);
+        BufferedImage newImg = new BufferedImage(bufImg.getWidth(), bufImg.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+        for(int x = 0; x < bufImg.getWidth(); x++){
+            for(int y = 0; y < bufImg.getHeight(); y++){
+                newImg.setRGB(x, y, bufImg.getRGB(x, y));
+            }
+        }
+
+        return newImg;
     }
 
 
