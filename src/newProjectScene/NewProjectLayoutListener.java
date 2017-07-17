@@ -34,9 +34,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
 
     public static NewProjectLayoutListener getInstance() {return ourInstance;}
 
-    private NewProjectLayoutListener() {
-    }
-
+    private NewProjectLayoutListener() {}
 
     public void init(NewProjectLayout newProjectLayout){
         this.newProjectLayout = newProjectLayout;
@@ -130,8 +128,6 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
 
                 }else{
                     handoverTiles = createGridTilesFromDir(selectedImagesFolder);
-
-
                 }
 
                 Main.changeToHighlightDetectionScene(handoverTiles, selectedImagesFolder);
@@ -203,6 +199,10 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
         if(!convertedFolder.exists()){ convertedFolder.mkdir(); }
 
         ImageGridTile[] gridTiles = newProjectLayout.getSelectedImages().getGridTiles();
+
+        if(gridTiles[0].getName().toLowerCase().endsWith(".jpg")){
+            return Main.currentImagesFolder;
+        }
 
         HashSet<ImageGridTile> gridTileSet = new HashSet<>();
         for(ImageGridTile tile : gridTiles){gridTileSet.add(tile);}

@@ -6,6 +6,8 @@ import guiComponents.ScrollableImageGridForCrop;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -66,6 +68,9 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
 
     private Label finalCircleRLabel;
     private TextField finalCircleR;
+
+    private Label highlightLevelLabel;
+    private Slider highlightLevelSlider;
 
 
     private static HighlightDetectionLayout ourInstance = new HighlightDetectionLayout();
@@ -295,6 +300,14 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
         finalCircleRLabel = new Label("Final R:");
         finalCircleR = createBottomField("finalCircleR");
 
+        highlightLevelLabel = new Label("Highlight Threshold:");
+        highlightLevelSlider = new Slider(0, 255, 200);
+        highlightLevelSlider.setShowTickMarks(true);
+        highlightLevelSlider.setShowTickLabels(true);
+        highlightLevelSlider.setMajorTickUnit(50);
+        highlightLevelSlider.setMinorTickCount(2);
+        highlightLevelSlider.setBlockIncrement(10);
+
         nextButton = new Button("Detect Highlights >");
         nextButton.setId("nextButton");
         nextButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
@@ -303,7 +316,8 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
 
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(backButton, spacer, finalCircleXLabel, finalCircleX,
-                                    finalCircleYLabel, finalCircleY, finalCircleRLabel, finalCircleR, nextButton);
+                                    finalCircleYLabel, finalCircleY, finalCircleRLabel, finalCircleR,
+                                            highlightLevelLabel, highlightLevelSlider, nextButton);
         hBox.setSpacing(10);
         hBox.setPadding(new Insets(5, 5, 5, 5));
 
@@ -311,12 +325,36 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     }
 
     public void resetScene(){
-        disableNodes(nextButton, finalCircleXLabel, finalCircleX,
-                finalCircleYLabel, finalCircleY, finalCircleRLabel, finalCircleR);
+        Utils.disableNodes(nextButton, finalCircleXLabel, finalCircleX,
+                finalCircleYLabel, finalCircleY, finalCircleRLabel, highlightLevelLabel,
+                    highlightLevelSlider, finalCircleR);
     }
 
-    private void disableNodes(Node... nodes){
-        for(Node node : nodes){node.setDisable(true);}
+
+    public void enableFinalParamsNodes(){
+        Utils.enableNodes(nextButton, finalCircleXLabel, finalCircleX,
+                finalCircleYLabel, finalCircleY, finalCircleRLabel, highlightLevelLabel,
+                highlightLevelSlider, finalCircleR);
+    }
+
+
+    public void setFinalParamsFields(int x, int y, int r){
+        finalCircleX.setText(String.valueOf(x));
+        finalCircleY.setText(String.valueOf(y));
+        finalCircleR.setText(String.valueOf(r));
+    }
+
+    public int[] getFinalParamsFields(){
+        int x = Integer.parseInt(finalCircleX.getText());
+        int y = Integer.parseInt(finalCircleY.getText());
+        int r = Integer.parseInt(finalCircleR.getText());
+        int thresh = (int) highlightLevelSlider.getValue();
+
+        return new int[]{x, y, r, thresh};
+    }
+
+    public ImageGridTile[] getGridTiles(){
+        return imageGrid.getGridTiles();
     }
 
     private TextField createBottomField(String id){
@@ -337,6 +375,22 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
         }
     }
 
+    public int[] getSphereVals(){
+        try {
+            int x = Integer.parseInt(sphereXField.getText());
+            int y = Integer.parseInt(sphereYField.getText());
+            int r = Integer.parseInt(sphereRField.getText());
+
+            return new int[]{x, y, r};
+        }catch(NumberFormatException e){
+            return null;
+        }
+    }
+
+    public Bounds getImageBounds(){
+        return new BoundingBox(0, 0,
+                imageCropPane.getImage().getWidth(), imageCropPane.getImage().getHeight());
+    }
 
 
     public void setCircleSelectionActive(boolean active){
@@ -380,6 +434,6 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     public void updateSize(double width, double height) {
         imageGrid.setTheHeight(height);
         imageCropPane.updateSize();
-
     }
+
 }

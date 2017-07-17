@@ -183,7 +183,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
     private File createLPFileJPEGNoCrop(){
         return createNewLPFile(Main.currentAssemblyFolder.getAbsolutePath(),
-                                "_default" + ".lp",
+                                "_default.lp",
                                 true, null, true);
     }
 

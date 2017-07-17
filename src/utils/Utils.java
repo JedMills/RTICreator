@@ -1,6 +1,7 @@
 package utils;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -155,6 +156,14 @@ public class Utils {
         return false;
     }
 
+
+    public static void disableNodes(Node... nodes){
+        for(Node node : nodes){node.setDisable(true);}
+    }
+
+    public static void enableNodes(Node... nodes){
+        for(Node node : nodes){node.setDisable(false);}
+    }
 
 
     public static class BooleanHolder{

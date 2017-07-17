@@ -141,7 +141,6 @@ public class ScrollableImageGrid extends BorderPane {
             }
         }
         return tiles;
-
     }
 
 

@@ -102,13 +102,8 @@ public class ImageGridTile extends VBox {
         HBox labelBox = new HBox();
         labelBox.setAlignment(Pos.CENTER);
 
-        if(hasTickBox){
-            checkBox = new CheckBox();
-            labelBox.getChildren().addAll(checkBox, label);
-        }else{
-            labelBox.getChildren().add(label);
+        labelBox.getChildren().add(label);
 
-        }
         getChildren().addAll(borderPane, labelBox);
         setAlignment(Pos.TOP_CENTER);
 

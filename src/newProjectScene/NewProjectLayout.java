@@ -86,12 +86,11 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         HBox.setHgrow(removePicPane, Priority.NEVER);
         HBox.setHgrow(rejectedImages, Priority.ALWAYS);
 
-        HBox.setMargin(toolbarLayout, new Insets(5, 5, 5, 5));
-        HBox.setMargin(selectedImages, new Insets(5, 5, 5, 5));
-        HBox.setMargin(removePicPane, new Insets(5, 5, 5, 5));
-        HBox.setMargin(rejectedImages, new Insets(5, 5, 5,5 ));
+        mainLayout.setSpacing(5);
 
         nextBackBox = createNextBackBox();
+        setSpacing(5);
+        setPadding(new Insets(5, 5, 5, 5));
     }
 
 
@@ -146,8 +145,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
         vBox.getChildren().addAll(openBtnBox, projectPropertiesPane);
 
-        vBox.setSpacing(20);
-        vBox.setPadding(new Insets(5, 5, 5, 5));
+        vBox.setSpacing(10);
         vBox.setAlignment(Pos.CENTER);
         vBox.setMinWidth(175);
 
@@ -173,8 +171,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.getColumns().add(fieldColumn);
         table.getColumns().add(valueColumn);
-
-
 
         return table;
     }
@@ -202,7 +198,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             insidePane.setPadding(new Insets(5, 5, 5, 5));
             insidePane.setAlignment(Pos.CENTER);
         removePicPane.getChildren().add(insidePane);
-        removePicPane.setPadding(new Insets(5, 5, 5, 5));
         removePicPane.setAlignment(Pos.CENTER);
         removePicPane.setMaxWidth(180);
         removePicPane.setMinWidth(130);
@@ -243,7 +238,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     private ScrollableImageGrid createSelectedImagesView(){
         ScrollableImageGrid imageGrid  = new ScrollableImageGrid("Selected Images", false,
                                                                 true, true);
-        imageGrid.setPadding(new Insets(5, 5, 5, 5));
         imageGrid.setMaxHeight(Double.MAX_VALUE);
         imageGrid.setMaxWidth(Double.MAX_VALUE);
         imageGrid.setMinWidth(180);
@@ -257,7 +251,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     private ScrollableImageGrid createRejectedImagesView(){
         ScrollableImageGrid imageGrid  = new ScrollableImageGrid("Rejected Images", false,
                                                                     true, true);
-        imageGrid.setPadding(new Insets(5, 5, 5, 5));
         imageGrid.setMaxHeight(Double.MAX_VALUE);
         imageGrid.setMaxWidth(Double.MAX_VALUE);
         imageGrid.setMinWidth(180);
@@ -600,7 +593,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     public String getImagesExtension(){
         String s = selectedImages.getGridTiles()[0].getName().split("[.]")[1].toLowerCase();
-        System.out.println(s);
         return s;
     }
 

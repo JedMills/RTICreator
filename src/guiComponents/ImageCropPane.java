@@ -59,7 +59,7 @@ public class ImageCropPane extends BorderPane{
 
         private String asString;
 
-        private Colour(String name){
+        Colour(String name){
             asString = name;
         }
 
@@ -127,6 +127,8 @@ public class ImageCropPane extends BorderPane{
 
 
     private void scaleCirclePos(double deltaW, double deltaH){
+        if(Double.isInfinite(deltaW) || Double.isInfinite(deltaH)){return;}
+
         circleSelection.centerCircle.setCenterX(circleSelection.centerCircle.getCenterX() * deltaW);
         circleSelection.centerCircle.setCenterY(circleSelection.centerCircle.getCenterY() * deltaH);
 
@@ -138,6 +140,8 @@ public class ImageCropPane extends BorderPane{
 
 
     private void scaleRectPos(double deltaW, double deltaH){
+
+        if(Double.isInfinite(deltaW) || Double.isInfinite(deltaH)){return;}
         bandSelection.topLeftHandle.setX(bandSelection.topLeftHandle.getX() * deltaW);
         bandSelection.topLeftHandle.setY(bandSelection.topLeftHandle.getY() * deltaH);
 
@@ -315,6 +319,8 @@ public class ImageCropPane extends BorderPane{
         circleSelection.edgeCircle.setCenterX(x + r);
         circleSelection.edgeCircle.setCenterY(y);
         circleSelection.setCircleRadius();
+
+        updateSpinners();
     }
 
 
@@ -411,7 +417,7 @@ public class ImageCropPane extends BorderPane{
             this.parent = parent;
             this.group = group;
 
-            circle = new Circle();
+            circle = new Circle(0 ,0 ,0);
             circle.setStrokeWidth(1);
 
             centerCircle = new Circle(0, 0, 10);

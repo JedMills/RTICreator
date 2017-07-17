@@ -45,15 +45,6 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
                     RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(), projectType);
                     Main.changeToNewProjLayout(createdProject);
                 }
-            }else if(source.getId().equals("openExistingProject")){
-                Main.directoryChooser.setTitle("Open existing project");
-
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        File file = Main.directoryChooser.showDialog(Main.primaryStage);
-                    }
-                });
             }
         }
     }

@@ -19,7 +19,6 @@ public class InitialLayout extends VBox implements CreatorScene {
     private RadioButton highlightProjBtn;
     private RadioButton lpFileProjBtn;
     private Button startNewProjectBtn;
-    private Button openExistingProjectBtn;
     private TextField projectNameField;
 
     private static InitialLayout ourInstance = new InitialLayout();
@@ -87,11 +86,8 @@ public class InitialLayout extends VBox implements CreatorScene {
         startNewProjectBtn.setId("startNewProject");
         startNewProjectBtn.setOnAction(InitialSceneListener.getInstance());
 
-        openExistingProjectBtn = new Button("Open existing project");
-        openExistingProjectBtn.setId("openExistingProject");
-        openExistingProjectBtn.setOnAction(InitialSceneListener.getInstance());
 
-        hBox.getChildren().addAll(startNewProjectBtn, openExistingProjectBtn);
+        hBox.getChildren().addAll(startNewProjectBtn);
         hBox.setSpacing(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.setPadding(new Insets(10, 0, 10, 0));
@@ -145,10 +141,6 @@ public class InitialLayout extends VBox implements CreatorScene {
 
     public Button getStartNewProjectBtn() {
         return startNewProjectBtn;
-    }
-
-    public Button getOpenExistingProjectBtn() {
-        return openExistingProjectBtn;
     }
 
     public TextField getProjectNameField() {

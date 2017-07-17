@@ -63,9 +63,9 @@ public class Main extends Application {
         setupDialogs();
         createScenes();
 
-        //setCreatorStage(initialScene, InitialLayout.getInstance());
+        setCreatorStage(initialScene, InitialLayout.getInstance());
         //setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
-        setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
+        //setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -153,6 +153,7 @@ public class Main extends Application {
         ArrayList<ImageGridTile> clones = (ArrayList<ImageGridTile>) approvedTiles.clone();
         CropExecuteLayout.getInstance().setLPTiles(clones);
         setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
+        CropExecuteLayout.getInstance().setFirstGridTileSelected();
     }
 
 

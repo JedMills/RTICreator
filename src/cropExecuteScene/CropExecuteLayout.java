@@ -81,7 +81,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         HBox bottomBar = createBottomBar();
 
         getChildren().addAll(mainLayout, bottomBar);
-        setSpacing(10);
+        setSpacing(5);
         setPadding(new Insets(5, 5, 5, 5));
         setFillWidth(true);
     }
@@ -94,8 +94,14 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         HBox hBox = new HBox();
 
         leftPane = createLeftPane();
+        leftPane.setMaxWidth(380);
+        leftPane.setMinWidth(380);
+
         cropPane = createCropPane();
+
         fitterInterfacePane = createFitterPane();
+        fitterInterfacePane.setMaxWidth(325);
+        fitterInterfacePane.setMinWidth(325);
 
 
         HBox.setHgrow(leftPane, Priority.SOMETIMES);
@@ -105,7 +111,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
         hBox.setPadding(new Insets(5, 5, 5, 5));
         hBox.getChildren().addAll(leftPane, cropPane, fitterInterfacePane);
-        hBox.setSpacing(10);
+        hBox.setSpacing(5);
         hBox.setFillHeight(true);
         return hBox;
     }
@@ -173,8 +179,10 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             fitterOutputArea = new TextArea();
             fitterOutputArea.setEditable(false);
             fitterOutputArea.setMinHeight(10);
-            fitterOutputArea.setMinWidth(10);
-            fitterOutputArea.setMaxWidth(320);
+            //fitterOutputArea.setMinWidth(10);
+            //fitterOutputArea.setMaxWidth(320);
+            fitterOutputArea.setPrefWidth(Double.MAX_VALUE);
+            fitterOutputArea.setPrefHeight(Double.MAX_VALUE);
         fitterOutputBox.setAlignment(Pos.CENTER);
         fitterOutputBox.getChildren().addAll(fitterOutLabel, fitterOutputArea);
 
@@ -405,6 +413,16 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             tile.setParent(lpImagesGrid);
         }
         lpImagesGrid.setImageView(imageCropPane);
+    }
+
+    public void setFirstGridTileSelected(){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                lpImagesGrid.setSelectedTile(lpImagesGrid.getGridTiles()[0]);
+                imageCropPane.setImage(lpImagesGrid.getGridTiles()[0].getImage());
+            }
+        });
     }
 
 
