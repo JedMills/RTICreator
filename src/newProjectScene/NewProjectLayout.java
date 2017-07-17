@@ -311,6 +311,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
                 if(currentImg.getWidth() != imageWidth || currentImg.getHeight() != imageHeight){
                     Main.showFileReadingAlert("The width and height of all images in the folder do not match.");
+                    Main.hideLoadingDialog();
                     return;
                 }
 
@@ -318,6 +319,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
                 if((name.endsWith(".png") && format.equals("jpg")) ||
                         (name.endsWith(".jpg") && format.equals("png"))){
                     Main.showFileReadingAlert("All images in folder must be of the same format.");
+                    Main.hideLoadingDialog();
                     return;
                 }
 

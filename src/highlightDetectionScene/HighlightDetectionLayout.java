@@ -2,18 +2,19 @@ package highlightDetectionScene;
 
 import guiComponents.ImageCropPane;
 import guiComponents.ImageGridTile;
-import guiComponents.ScrollableImageGrid;
+import guiComponents.ScrollableImageGridForCrop;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import main.CreatorScene;
@@ -29,40 +30,43 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     private Button nextButton;
     private Button backButton;
 
-    private ScrollableImageGrid imageGrid;
+    private ScrollableImageGridForCrop imageGrid;
     private ImageCropPane imageCropPane;
 
-    private Label sphereDetectTitle;
 
-    private Label sphereColorBoxLabel;
-    private ComboBox<String> sphereColourComboBox;
-
-    private Label detectSphereLabel;
-    private Button detectSphereButton;
-
-    private Label setSphereTitle;
+    private Label circleCropColourLabel;
+    private ComboBox<ImageCropPane.Colour> circleCropColourBox;
 
     private Label sphereXLabel;
-    private Spinner<Integer> sphereXSpinner;
+    private Button sphereXPlus;
+    private Button sphereXMinus;
+    private TextField sphereXField;
 
     private Label sphereYLabel;
-    private Spinner<Integer> sphereYSpinner;
+    private Button sphereYPlus;
+    private Button sphereYMinus;
+    private TextField sphereYField;
 
     private Label sphereRadiusLabel;
-    private Spinner<Integer> sphereRadiusSpinner;
+    private Button sphereRPlus;
+    private Button sphereRMinus;
+    private TextField sphereRField;
 
     private Label setSphereLabel;
     private Button setSphereButton;
 
-    private Label lastToolboxTitle;
+    private Image plusImage;
+    private Image minusImage;
 
-    private Button highlightDetectButton;
-    private Button redoProcessButton;
+    private Label finalCircleXLabel;
+    private TextField finalCircleX;
 
+    private Label finalCircleYLabel;
+    private TextField finalCircleY;
 
-    private enum HighlightProcessState{DETECT_SPHERE, POSITION_SPHERE, HIGHLIGHT_DETECT;}
+    private Label finalCircleRLabel;
+    private TextField finalCircleR;
 
-    private HighlightProcessState currentState;
 
     private static HighlightDetectionLayout ourInstance = new HighlightDetectionLayout();
 
@@ -71,6 +75,9 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     }
 
     private HighlightDetectionLayout() {
+        plusImage = new Image("images/plus.png");
+        minusImage = new Image("images/minus.png");
+
         HBox mainLayout = createMainLayout();
         HBox bottomBar = createBottomBar();
 
@@ -79,9 +86,7 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
         setPadding(new Insets(5, 5, 5, 5));
         setSpacing(5);
 
-        imageCropPane.setImage(new Image("images/fish_fossil_01.jpg"));
-
-        setCurrentState(HighlightProcessState.DETECT_SPHERE);
+        HighlightDetectionLayoutListener.getInstance().init(this);
     }
 
 
@@ -89,74 +94,52 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     private HBox createMainLayout(){
         HBox hBox = new HBox();
 
-            imageGrid = new ScrollableImageGrid("Selected Images", true, true, true);
-            imageGrid.setMinWidth(300);
-            imageGrid.setMaxWidth(500);
+            VBox imagesAndTools= new VBox();
+            imageGrid = new ScrollableImageGridForCrop("Selected Images", false,
+                                                    true, true, imageCropPane);
+            imagesAndTools.getChildren().add(imageGrid);
+            imagesAndTools.setSpacing(5);
+
+            imageGrid.setMinWidth(380);
+            imageGrid.setMaxWidth(380);
 
             VBox cropAndToolsBox = new VBox();
-                imageCropPane = createImageCropPane(cropAndToolsBox);
-
                 VBox toolsBox = createToolsBox();
+                imagesAndTools.getChildren().add(toolsBox);
+                imageCropPane = createImageCropPane(cropAndToolsBox);
+                imageGrid.setImageView(imageCropPane);
 
-            cropAndToolsBox.getChildren().addAll(imageCropPane, toolsBox);
+            cropAndToolsBox.getChildren().addAll(imageCropPane);
             cropAndToolsBox.setSpacing(5);
             cropAndToolsBox.setAlignment(Pos.CENTER);
 
 
-        hBox.getChildren().addAll(imageGrid, cropAndToolsBox);
+        hBox.getChildren().addAll(imagesAndTools, cropAndToolsBox);
         hBox.setAlignment(Pos.CENTER);
         hBox.setSpacing(5);
 
         HBox.setHgrow(cropAndToolsBox, Priority.SOMETIMES);
-        HBox.setHgrow(imageGrid, Priority.SOMETIMES);
+        HBox.setHgrow(imageGrid, Priority.ALWAYS);
 
         return hBox;
     }
 
-
-    private ImageView createArrowImageView(Image image, int width, int height){
-        ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(height);
-        imageView.setFitWidth(width);
-        imageView.setSmooth(true);
-        imageView.setPreserveRatio(true);
-
-        return imageView;
-    }
 
 
 
     private VBox createToolsBox(){
         VBox toolsBox = new VBox();
 
-        Image arrow = new Image("images/arrow-right-6x.png");
-
         Label toolsBoxLabel = new Label("Highlight Processing");
         toolsBoxLabel.setFont(Font.font(null, FontWeight.BOLD, 12));
 
         HBox tools = new HBox();
 
-        VBox sphereDetectionBox = createSphereDetectionBox();
-
-        VBox firstArrow = new VBox(createArrowImageView(arrow, 25, 25));
-        firstArrow.setAlignment(Pos.CENTER);
-
-        VBox spherePositionBox = createSpherePositionBox();
+        GridPane spherePositionBox = createSpherePositionBox();
 
 
-        VBox secondArrow = new VBox(createArrowImageView(arrow, 25, 25));
-        secondArrow.setAlignment(Pos.CENTER);
-
-        VBox endBox = createLastToolbox();
-
-
-        tools.getChildren().addAll(sphereDetectionBox, firstArrow, spherePositionBox, secondArrow, endBox);
+        tools.getChildren().addAll(spherePositionBox);
         tools.setAlignment(Pos.CENTER);
-        HBox.setHgrow(sphereDetectionBox, Priority.SOMETIMES);
-        HBox.setHgrow(firstArrow, Priority.SOMETIMES);
-        HBox.setHgrow(spherePositionBox, Priority.SOMETIMES);
-        HBox.setHgrow(secondArrow, Priority.SOMETIMES);
-        HBox.setHgrow(endBox, Priority.SOMETIMES);
 
         toolsBox.getChildren().addAll(toolsBoxLabel, tools);
         toolsBox.setSpacing(10);
@@ -171,130 +154,112 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
 
 
 
-    private VBox createLastToolbox(){
-        VBox vBox = new VBox();
-
-        lastToolboxTitle = new Label("Highlight Detection");
-
-        highlightDetectButton = new Button("Detect highlights");
-        highlightDetectButton.setId("detectHighlightsButton");
-        highlightDetectButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
-        highlightDetectButton.setMaxWidth(Double.MAX_VALUE);
-
-        redoProcessButton = new Button("Redo process");
-        redoProcessButton.setId("redoProcessButton");
-        redoProcessButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
-        redoProcessButton.setMaxWidth(Double.MAX_VALUE);
-
-        vBox.getChildren().addAll(lastToolboxTitle, highlightDetectButton, redoProcessButton);
-        vBox.setSpacing(10);
-        vBox.getStyleClass().add("defaultBorder");
-        vBox.setAlignment(Pos.TOP_CENTER);
-        vBox.setPadding(new Insets(5, 5, 5, 5));
-
-        return vBox;
-    }
 
 
-
-
-    private VBox createSpherePositionBox(){
-        VBox vBox = new VBox();
-
-            setSphereTitle = new Label("Sphere Positioning");
-
-            GridPane gridPane = new GridPane();
-
-                sphereXLabel = new Label("Center X:");
-                GridPane.setConstraints(sphereXLabel, 0, 0);
-
-                sphereXSpinner = new Spinner<>(0, Integer.MAX_VALUE, 0, 1);
-                sphereXSpinner.setPrefWidth(100);
-                GridPane.setConstraints(sphereXSpinner, 1, 0);
-
-                sphereYLabel = new Label("Center Y:");
-                GridPane.setConstraints(sphereYLabel, 0, 1);
-
-                sphereYSpinner = new Spinner<>(0, Integer.MAX_VALUE, 0, 1);
-                sphereYSpinner.setPrefWidth(100);
-                GridPane.setConstraints(sphereYSpinner, 1, 1);
-
-                sphereRadiusLabel = new Label("Radius:");
-                GridPane.setConstraints(sphereRadiusLabel, 0, 2);
-
-                sphereRadiusSpinner = new Spinner<>(0, Integer.MAX_VALUE, 0, 1);
-                sphereRadiusSpinner.setPrefWidth(100);
-                GridPane.setConstraints(sphereRadiusSpinner, 1, 2);
-
-                setSphereLabel = new Label("Set sphere:");
-                GridPane.setConstraints(setSphereLabel, 0, 3);
-
-                setSphereButton = new Button("Set");
-                setSphereButton.setId("setSphereButton");
-                setSphereButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
-                GridPane.setConstraints(setSphereButton, 1, 3);
-
-            gridPane.getChildren().addAll(  sphereXLabel,       sphereXSpinner,
-                                            sphereYLabel,       sphereYSpinner,
-                                            sphereRadiusLabel,  sphereRadiusSpinner,
-                                            setSphereLabel,     setSphereButton);
-            gridPane.getStyleClass().add("noBorderClass");
-            gridPane.setAlignment(Pos.CENTER);
-            gridPane.setHgap(10);
-            gridPane.setVgap(10);
-
-
-        vBox.getChildren().addAll(setSphereTitle, gridPane);
-        vBox.setAlignment(Pos.TOP_CENTER);
-        vBox.setSpacing(10);
-        vBox.getStyleClass().add("defaultBorder");
-        vBox.setPadding(new Insets(5, 5, 5, 5));
-
-        return vBox;
-    }
-
-
-
-
-
-
-    private VBox createSphereDetectionBox(){
-        VBox vBox = new VBox();
-
-        sphereDetectTitle = new Label("Sphere Detection");
-
+    private GridPane createSpherePositionBox(){
         GridPane gridPane = new GridPane();
-        sphereColorBoxLabel = new Label("Sphere colour:");
-        GridPane.setConstraints(sphereColorBoxLabel, 0, 0);
-        sphereColourComboBox = new ComboBox<>();
-        sphereColourComboBox.setItems(FXCollections.observableArrayList("Black", "Red"));
-        sphereColourComboBox.getSelectionModel().select(0);
-        GridPane.setConstraints(sphereColourComboBox, 1, 0);
 
-        detectSphereLabel = new Label("Detect sphere:");
-        GridPane.setConstraints(detectSphereLabel, 0, 1);
+            sphereXLabel = new Label("Center X:");
+            GridPane.setConstraints(sphereXLabel, 0, 1);
 
-        detectSphereButton = new Button("Detect");
-        detectSphereButton.setId("detectSphereButton");
-        detectSphereButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
-        detectSphereButton.setMaxWidth(Double.MAX_VALUE);
-        GridPane.setConstraints(detectSphereButton, 1, 1);
+            sphereXField = createTextField(1, 1);
+            sphereXMinus = createButton("-", "sphereXMinus", 2, 1);
+            sphereXPlus = createButton("+", "sphereXPlus", 3, 1);
 
-        gridPane.setVgap(10);
-        gridPane.setHgap(10);
+
+            sphereYLabel = new Label("Center Y:");
+            GridPane.setConstraints(sphereYLabel, 0, 2);
+
+            sphereYField = createTextField(1, 2);
+            sphereYMinus = createButton("-", "sphereYMinus", 2, 2);
+            sphereYPlus = createButton("+", "sphereYPlus", 3, 2);
+
+            sphereRadiusLabel = new Label("Radius:");
+            GridPane.setConstraints(sphereRadiusLabel, 0, 3);
+
+            sphereRField = createTextField(1, 3);
+            sphereRMinus = createButton("-", "sphereRMinus", 2, 3);
+            sphereRPlus = createButton("+", "sphereRPlus", 3, 3);
+
+            setSphereLabel = new Label("Set sphere:");
+            GridPane.setConstraints(setSphereLabel, 0, 4);
+
+            setSphereButton = new Button("Set");
+            setSphereButton.setId("setSphereButton");
+            setSphereButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
+            GridPane.setConstraints(setSphereButton, 1, 4, 3, 1);
+            setSphereButton.setMaxWidth(Double.MAX_VALUE);
+
+
+            circleCropColourLabel = new Label("Selector colour:");
+            GridPane.setConstraints(circleCropColourLabel, 0, 0);
+
+            circleCropColourBox = new ComboBox<>(FXCollections.observableArrayList(ImageCropPane.Colour.BLACK,
+                                                                                    ImageCropPane.Colour.GREY,
+                                                                                    ImageCropPane.Colour.WHITE,
+                                                                                    ImageCropPane.Colour.RED,
+                                                                                    ImageCropPane.Colour.GREEN,
+                                                                                    ImageCropPane.Colour.BLUE));
+            circleCropColourBox.setOnAction(HighlightDetectionLayoutListener.getInstance());
+            circleCropColourBox.getSelectionModel().select(ImageCropPane.Colour.BLUE);
+            circleCropColourBox.setMaxWidth(Double.MAX_VALUE);
+            GridPane.setConstraints(circleCropColourBox, 1, 0, 3, 1);
+
+
+        gridPane.getChildren().addAll(  sphereXLabel,           sphereXField,       sphereXMinus,   sphereXPlus,
+                                        sphereYLabel,           sphereYField,       sphereYMinus,   sphereYPlus,
+                                        sphereRadiusLabel,      sphereRField,       sphereRMinus,   sphereRPlus,
+                                        setSphereLabel,         setSphereButton,
+                                        circleCropColourLabel,  circleCropColourBox);
+
+
         gridPane.getStyleClass().add("noBorderClass");
-        gridPane.getChildren().addAll(  sphereColorBoxLabel,    sphereColourComboBox,
-                                        detectSphereLabel,      detectSphereButton);
         gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
 
 
-        vBox.getChildren().addAll(sphereDetectTitle, gridPane);
-        vBox.setAlignment(Pos.TOP_CENTER);
-        vBox.setSpacing(10);
-        vBox.getStyleClass().add("defaultBorder");
-        vBox.setPadding(new Insets(5, 5, 5,5));
+        return gridPane;
+    }
 
-        return vBox;
+    public void translateCircleSelect(int dx, int dy){
+        imageCropPane.translateCircleFromGUI(dx, dy);
+    }
+
+    public void changeCircleR(int dr){
+        imageCropPane.changeRFromGUI(dr);
+    }
+
+    private TextField createTextField(int col, int row){
+        TextField textField = new TextField();
+        GridPane.setConstraints(textField, col, row);
+        textField.setEditable(false);
+        textField.setPrefWidth(60);
+        textField.setMinWidth(0);
+
+        return textField;
+    }
+
+
+    private Button createButton(String label, String id, int col, int row){
+        Button button = new Button();
+        button.setId(id);
+        button.setOnAction(HighlightDetectionLayoutListener.getInstance());
+        GridPane.setConstraints(button, col, row);
+        button.setShape(new Circle(12.5));
+
+        ImageView imageView = new ImageView();
+        if(label.equals("-")){
+            imageView.setImage(minusImage);
+        }else if(label.equals("+")){
+            imageView.setImage(plusImage);
+        }
+        imageView.setFitWidth(8);
+        imageView.setFitHeight(8);
+
+        button.setGraphic(imageView);
+
+        return button;
     }
 
 
@@ -302,15 +267,12 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
 
 
     private ImageCropPane createImageCropPane(VBox vBox){
-        ImageCropPane cropPane = new ImageCropPane();
+        ImageCropPane cropPane = new ImageCropPane(sphereXField, sphereYField,sphereRField);
         cropPane.prefHeightProperty().bind(vBox.heightProperty());
         cropPane.prefWidthProperty().bind(vBox.widthProperty());
         cropPane.setMinHeight(0);
         cropPane.setMinWidth(0);
         cropPane.setStyle("-fx-background-color: #000000;");
-
-        //cropPane.setCropActive(true);
-        //cropPane.changeColour(ImageCropPane.Colour.BLUE);
 
         return cropPane;
     }
@@ -324,54 +286,48 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
         backButton.setId("backButton");
         backButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
 
-        nextButton = new Button("Next >");
+        finalCircleXLabel = new Label("Final X:");
+        finalCircleX = createBottomField("finalXField");
+
+        finalCircleYLabel = new Label("Final Y:");
+        finalCircleY = createBottomField("finalCircleY");
+
+        finalCircleRLabel = new Label("Final R:");
+        finalCircleR = createBottomField("finalCircleR");
+
+        nextButton = new Button("Detect Highlights >");
         nextButton.setId("nextButton");
         nextButton.setOnAction(HighlightDetectionLayoutListener.getInstance());
 
         Pane spacer = Utils.createSpacer();
 
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(backButton, spacer, nextButton);
+        hBox.getChildren().addAll(backButton, spacer, finalCircleXLabel, finalCircleX,
+                                    finalCircleYLabel, finalCircleY, finalCircleRLabel, finalCircleR, nextButton);
+        hBox.setSpacing(10);
         hBox.setPadding(new Insets(5, 5, 5, 5));
 
         return hBox;
     }
 
-
-    public void setCurrentState(HighlightProcessState state){
-        currentState = state;
-        disableAllToolboxNodes();
-
-        if(state.equals(HighlightProcessState.DETECT_SPHERE)){
-            enableNodes(sphereDetectTitle, sphereColorBoxLabel, sphereColourComboBox,
-                                detectSphereLabel, detectSphereButton);
-
-        }else if(state.equals(HighlightProcessState.POSITION_SPHERE)){
-            enableNodes(setSphereTitle, sphereXLabel, sphereXSpinner, sphereYLabel, sphereYSpinner,
-                            sphereRadiusLabel, sphereRadiusSpinner, setSphereLabel, setSphereButton);
-
-        }else if(state.equals(HighlightProcessState.HIGHLIGHT_DETECT)){
-            enableNodes(lastToolboxTitle, highlightDetectButton, redoProcessButton);
-
-        }
-    }
-
-
-    private void disableAllToolboxNodes(){
-        disableNodes(sphereDetectTitle, setSphereTitle, lastToolboxTitle,
-                        sphereColorBoxLabel, sphereColourComboBox, detectSphereLabel, detectSphereButton,
-                                sphereXLabel, sphereXSpinner, sphereYLabel, sphereYSpinner,
-                                    sphereRadiusLabel, sphereRadiusSpinner, setSphereLabel,
-                                        setSphereButton, highlightDetectButton, redoProcessButton);
+    public void resetScene(){
+        disableNodes(nextButton, finalCircleXLabel, finalCircleX,
+                finalCircleYLabel, finalCircleY, finalCircleRLabel, finalCircleR);
     }
 
     private void disableNodes(Node... nodes){
-        for (Node node : nodes){node.setDisable(true);}
+        for(Node node : nodes){node.setDisable(true);}
     }
 
-    private void enableNodes(Node... nodes){
-        for(Node node : nodes){node.setDisable(false);}
+    private TextField createBottomField(String id){
+        TextField textField = new TextField();
+        textField.setPrefWidth(60);
+        textField.setEditable(false);
+        textField.setId(id);
+
+        return textField;
     }
+
 
 
     public void setTiles(ArrayList<ImageGridTile> imageGridTiles){
@@ -382,6 +338,23 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     }
 
 
+
+    public void setCircleSelectionActive(boolean active){
+        imageCropPane.setCircleActive(active);
+        imageCropPane.setCircleSelection(imageCropPane.getImageView().getBoundsInParent().getWidth() / 2,
+                                            imageCropPane.getImageView().getBoundsInParent().getHeight() / 2,
+                                            30);
+        imageCropPane.changeColour(ImageCropPane.Colour.BLUE);
+    }
+
+    public void setCircleSelectionColour(ImageCropPane.Colour colour){
+        imageCropPane.changeColour(colour);
+    }
+
+
+    public void setFirstTileSelected(){
+        imageGrid.setSelectedTile(imageGrid.getGridTiles()[0]);
+    }
 
     @Override
     public int getSceneMinWidth() {
@@ -407,5 +380,6 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
     public void updateSize(double width, double height) {
         imageGrid.setTheHeight(height);
         imageCropPane.updateSize();
+
     }
 }

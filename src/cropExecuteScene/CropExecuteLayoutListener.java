@@ -384,7 +384,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
         if(cropExecuteLayout.ptmSelected()){
             Main.fileChooser.setTitle("Select Destination For PTM");
             Main.fileChooser.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("Poly Texture Map File (.ptm)",
+                        new FileChooser.ExtensionFilter("Polynomial Texture Map File (.ptm)",
                                                                 ".ptm"));
         }else{
             Main.fileChooser.setTitle("Select Destination For HSH");

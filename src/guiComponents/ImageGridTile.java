@@ -198,4 +198,9 @@ public class ImageGridTile extends VBox {
     public int getTileHeight() {
         return height;
     }
+
+
+    public void setTickBoxActive(boolean active){
+        if(hasTickBox){checkBox.setDisable(!active);}
+    }
 }

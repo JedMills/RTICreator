@@ -143,4 +143,12 @@ public class ScrollableImageGrid extends BorderPane {
         return tiles;
 
     }
+
+
+    public void setTickBoxesActive(boolean active){
+        for(Node node : tilePane.getChildren()){
+            ImageGridTile tile = (ImageGridTile) node;
+            tile.setTickBoxActive(active);
+        }
+    }
 }

@@ -63,9 +63,9 @@ public class Main extends Application {
         setupDialogs();
         createScenes();
 
-        setCreatorStage(initialScene, InitialLayout.getInstance());
+        //setCreatorStage(initialScene, InitialLayout.getInstance());
         //setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
-        //setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
+        setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
 
         primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -236,6 +236,9 @@ public class Main extends Application {
             @Override
             public void run() {
                 setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
+                HighlightDetectionLayout.getInstance().setFirstTileSelected();
+                HighlightDetectionLayout.getInstance().setCircleSelectionActive(true);
+                HighlightDetectionLayout.getInstance().resetScene();
             }
         });
     }
