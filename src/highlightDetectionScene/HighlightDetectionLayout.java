@@ -410,6 +410,15 @@ public class HighlightDetectionLayout extends VBox implements CreatorScene{
         imageGrid.setSelectedTile(imageGrid.getGridTiles()[0]);
     }
 
+
+    public void resetImageGrid(){
+        if(imageGrid.getGridTiles().length > 0){
+            imageGrid.clearTiles();
+        }
+    }
+
+
+
     @Override
     public int getSceneMinWidth() {
         return 1000;

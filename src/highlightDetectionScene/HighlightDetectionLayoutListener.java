@@ -55,6 +55,7 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
                 setSphere();
 
             }else if(source.getId().equals("backButton")){
+                Main.backButtonPressed(highlightLayout);
 
             }else if(source.getId().equals("nextButton")){
                 highlightDetectAndMoveScene();
@@ -155,10 +156,12 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
 
                 Main.hideLoadingDialog();
 
+
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         Main.changeToCropExecuteScene(gridTilesArray);
+
                     }
                 });
 

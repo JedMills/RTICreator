@@ -40,7 +40,7 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
                     ProjectType projectType = null;
 
                     if(initialLayout.getHighlightProjBtn().isSelected()){projectType = ProjectType.HIGHLIGHT;}
-                    else if (initialLayout.getLpFileProjBtn().isSelected()){projectType = ProjectType.DOME_LP;}
+                    else if (initialLayout.getLpFileProjBtn().isSelected()){projectType = ProjectType.LP;}
 
                     RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(), projectType);
                     Main.changeToNewProjLayout(createdProject);

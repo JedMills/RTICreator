@@ -60,7 +60,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
                 browseOutputLocation();
 
             }else if(source.getId().equals("backButton")){
-                Main.backButtonPressed(cropExecuteLayout);
+                Main.backButtonPressed(cropExecuteLayout, cropExecuteLayout.getLpImagesGrid().getGridTiles());
 
             }
 

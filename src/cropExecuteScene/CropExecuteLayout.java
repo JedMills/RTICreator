@@ -13,6 +13,7 @@ import javafx.scene.text.FontWeight;
 import main.CreatorScene;
 import utils.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -109,7 +110,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         HBox.setHgrow(fitterInterfacePane, Priority.SOMETIMES);
 
 
-        hBox.setPadding(new Insets(5, 5, 5, 5));
         hBox.getChildren().addAll(leftPane, cropPane, fitterInterfacePane);
         hBox.setSpacing(5);
         hBox.setFillHeight(true);
@@ -179,10 +179,7 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
             fitterOutputArea = new TextArea();
             fitterOutputArea.setEditable(false);
             fitterOutputArea.setMinHeight(10);
-            //fitterOutputArea.setMinWidth(10);
-            //fitterOutputArea.setMaxWidth(320);
             fitterOutputArea.setPrefWidth(Double.MAX_VALUE);
-            fitterOutputArea.setPrefHeight(Double.MAX_VALUE);
         fitterOutputBox.setAlignment(Pos.CENTER);
         fitterOutputBox.getChildren().addAll(fitterOutLabel, fitterOutputArea);
 
@@ -477,7 +474,9 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     public String getImagesFormat(){
         String imageName = lpImagesGrid.getGridTiles()[0].getName().toLowerCase();
 
-        return imageName.substring(imageName.length() - 3);
+
+        return imageName.split("[.]")[1];
+        //return imageName.substring(imageName.length() - 3);
     }
 
 

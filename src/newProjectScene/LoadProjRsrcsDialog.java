@@ -235,7 +235,6 @@ public class LoadProjRsrcsDialog {
         }
 
         hBox.setAlignment(Pos.CENTER_RIGHT);
-        hBox.getStyleClass().add("defaultBorder");
         hBox.setPadding(new Insets(5, 5, 5, 5));
         hBox.setSpacing(10);
 

@@ -211,11 +211,13 @@ public class ImageCropPane extends BorderPane{
 
 
     private void addCircleSelection(){
-        circleSelection.group.getChildren().addAll( circleSelection.hCenterLine,
-                                                    circleSelection.vCenterLine,
-                                                    circleSelection.circle,
-                                                    circleSelection.centerCircle,
-                                                    circleSelection.edgeCircle);
+        if(!circleSelection.group.getChildren().contains(circleSelection.hCenterLine)) {
+            circleSelection.group.getChildren().addAll(circleSelection.hCenterLine,
+                    circleSelection.vCenterLine,
+                    circleSelection.circle,
+                    circleSelection.centerCircle,
+                    circleSelection.edgeCircle);
+        }
 
         circleSelection.centerCircle.setCenterX(imageView.getBoundsInParent().getWidth() / 4);
         circleSelection.centerCircle.setCenterY(imageView.getBoundsInParent().getHeight() / 4);

@@ -53,6 +53,8 @@ public class Main extends Application {
 
     public static final Image thumbnail = new Image("images/rtiThumbnail.png");
 
+    public static final String[] acceptedFormats = {"jpg", "png", "tif", "bmp"};
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -211,27 +213,56 @@ public class Main extends Application {
     }
 
 
+
     public static void backButtonPressed(CreatorScene currentScene){
         if(currentScene == NewProjectLayout.getInstance()){
             setCreatorStage(initialScene, InitialLayout.getInstance());
             NewProjectLayout.getInstance().resetScene();
 
         }else if(currentScene == CropExecuteLayout.getInstance()){
-            if(currentRTIProject.getProjectType().equals(ProjectType.DOME_LP)){
+            if(currentRTIProject.getProjectType().equals(ProjectType.LP)){
                 setCreatorStage(newProjScene, NewProjectLayout.getInstance());
                 CropExecuteLayout.getInstance().resetScene();
 
             }else if(currentRTIProject.getProjectType().equals(ProjectType.HIGHLIGHT)){
-
-
+                System.out.println("Num grid tiles before change of scene: " + HighlightDetectionLayout.getInstance().getGridTiles().length);
+                setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
+                System.out.println("Num grid tiles after change of scene: " + HighlightDetectionLayout.getInstance().getGridTiles().length);
+                CropExecuteLayout.getInstance().resetScene();
+                System.out.println("Num grid tiles after crop scene has been reset" + HighlightDetectionLayout.getInstance().getGridTiles().length);
             }
 
+
+        }else if(currentScene == HighlightDetectionLayout.getInstance()){
+            changeToNewProjLayout(Main.currentRTIProject);
 
         }
     }
 
 
-    public static void changeToHighlightDetectionScene(ArrayList<ImageGridTile> tilesToCopy, File selectedImagesFile){
+    public static void backButtonPressed(CreatorScene creatorScene, ImageGridTile[] tilesToPass){
+        if(creatorScene == CropExecuteLayout.getInstance()){
+            ArrayList<ImageGridTile> tilesArray = new ArrayList<>();
+            for(ImageGridTile tile : tilesToPass){tilesArray.add(tile);}
+            if(currentRTIProject.getProjectType().equals(ProjectType.HIGHLIGHT)){
+                changeToHighlightDetectionScene(tilesArray, true);
+            }else if(currentRTIProject.getProjectType().equals(ProjectType.LP)){
+                changeToNewProjLayout(Main.currentRTIProject);
+                NewProjectLayout.getInstance().addTilesToSelected(tilesArray);
+            }
+        }else{
+            backButtonPressed(creatorScene);
+        }
+    }
+
+
+
+
+    public static void changeToHighlightDetectionScene(ArrayList<ImageGridTile> tilesToCopy, boolean removeExistingTiles){
+        if(removeExistingTiles){
+            HighlightDetectionLayout.getInstance().resetImageGrid();
+        }
+
         HighlightDetectionLayout.getInstance().setTiles(tilesToCopy);
         Platform.runLater(new Runnable() {
             @Override

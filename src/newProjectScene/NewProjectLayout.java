@@ -33,13 +33,17 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     private Button openFolderBtn;
 
-    private Button addPropertyBtn;
-    private Button delPropertyBtn;
-    private TableView<ProjectProperty> projectPropertyTableView;
 
     private TextArea removeRsnTxtField;
     private Button removePicBtn;
     private Button replaceBtn;
+
+
+    private TextField projectNameField;
+    private TextField projectTypeField;
+    private TextField imageWidthField;
+    private TextField imageHeightField;
+
 
     private Button backBtn;
     private Button nextBtn;
@@ -70,7 +74,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         getStylesheets().add("stylesheets/default.css");
         NewProjectLayoutListener.getInstance().init(this);
         LoadProjRsrcsDialog.getInstance().init(this);
-        AddPropertyDialog.getInstance().init(this);
     }
 
 
@@ -117,26 +120,28 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             VBox projectPropertiesPane = new VBox();
                 Label propertiesLabel = new Label("Project Properties");
                 propertiesLabel.setFont(Font.font(null, FontWeight.BOLD, 12));
-                projectPropertyTableView = createPropertiesTable();
 
-                addPropertyBtn = new Button("Add");
-                addPropertyBtn.setId("addPropertyButton");
-                addPropertyBtn.setOnAction(NewProjectLayoutListener.getInstance());
+                GridPane gridPane = new GridPane();
+                    Label nameLabel = createLabel("Name:", 0, 0);
+                    projectNameField = createTextField(1, 0);
 
-                Pane spacer1 = new Pane();
-                HBox.setHgrow(spacer1, Priority.ALWAYS);
-                spacer1.setMinSize(10, 1);
+                    Label typeLabel = createLabel("Type:", 0, 1);
+                    projectTypeField = createTextField(1, 1);
 
-                delPropertyBtn = new Button("Delete");
-                delPropertyBtn.setId("delPropertyButton");
-                delPropertyBtn.setOnAction(NewProjectLayoutListener.getInstance());
+                    Label widthLabel = createLabel("Image Width:", 0, 2);
+                    imageWidthField = createTextField(1, 2);
 
-                HBox propertiesButtonsBox = new HBox();
-                propertiesButtonsBox.getChildren().addAll(addPropertyBtn, spacer1, delPropertyBtn);
-                propertiesButtonsBox.setStyle("-fx-border-color: transparent;");
-                propertiesButtonsBox.setId("propertiesButtonBox");
-                propertiesButtonsBox.setAlignment(Pos.CENTER);
-            projectPropertiesPane.getChildren().addAll(propertiesLabel, projectPropertyTableView, propertiesButtonsBox);
+                    Label heightLabel = createLabel("Image Height:", 0, 3);
+                    imageHeightField = createTextField(1, 3);
+                gridPane.getChildren().addAll(nameLabel, projectNameField, typeLabel, projectTypeField,
+                                                widthLabel, imageWidthField, heightLabel, imageHeightField);
+                gridPane.setHgap(5);
+                gridPane.setVgap(5);
+                gridPane.setAlignment(Pos.CENTER);
+                gridPane.getStyleClass().add("noBorderClass");
+                gridPane.setPadding(new Insets(5, 5, 5, 5));
+
+                projectPropertiesPane.getChildren().addAll(propertiesLabel, gridPane);
             projectPropertiesPane.setPadding(new Insets(5, 5, 5, 5));
             projectPropertiesPane.getStyleClass().add("projectPropertiesPane");
             projectPropertiesPane.setSpacing(5);
@@ -153,27 +158,22 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
 
+    private TextField createTextField(int col, int row){
+        TextField textField = new TextField();
+        textField.setPrefWidth(100);
+        textField.setEditable(false);
+        GridPane.setConstraints(textField, col, row);
 
-    private TableView createPropertiesTable(){
-        TableView<ProjectProperty> table = new TableView<>();
-        table.setMinHeight(0);
-        table.setMinWidth(0);
-        table.getColumns().clear();
-
-        TableColumn fieldColumn = new TableColumn("Field");
-        fieldColumn.setCellValueFactory(new PropertyValueFactory<ProjectProperty, String>("field"));
-        fieldColumn.setSortable(false);
-
-        TableColumn valueColumn = new TableColumn("Value");
-        valueColumn.setCellValueFactory(new PropertyValueFactory<ProjectProperty, String>("value"));
-        valueColumn.setSortable(false);
-
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.getColumns().add(fieldColumn);
-        table.getColumns().add(valueColumn);
-
-        return table;
+        return textField;
     }
+
+
+    private Label createLabel(String text, int col, int row){
+        Label label = new Label(text);
+        GridPane.setConstraints(label, col, row);
+        return label;
+    }
+
 
 
     private VBox createRemovePicPane(){
@@ -269,7 +269,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             File[] images = directory.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    if(name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png")){
+                    if(Utils.checkIn(Utils.getFileExtension(name.toLowerCase()), Main.acceptedFormats)){
                         return true;
                     }
                     return false;
@@ -287,11 +287,22 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             String[] imageLocations = new String[images.length];
             String[] imageNames = new String[images.length];
 
-            String format = "";
-            if(images[0].getName().toLowerCase().endsWith(".jpg")){format = "jpg";}
-            else if(images[0].getName().toLowerCase().endsWith(".png")){format = "png";}
+            String format = Utils.getFileExtension(images[0].getName());
 
-            Image firstImg = new Image("file:" + images[0].getAbsolutePath());
+            Image firstImg;
+            if(Utils.checkIn(format.toLowerCase(), new String[]{"jpg", "png"})){
+                firstImg = new Image("file:" + images[0].getAbsolutePath());
+            }else{
+                firstImg = Utils.readUnusualImage(images[0].getAbsolutePath());
+            }
+
+            if(firstImg == null){
+                Main.showFileReadingAlert("Error reading image files. Accepted formats are: " +
+                                        "'.jpg', '.png', '.tif', '.bmp'.");
+                Main.hideLoadingDialog();
+                return;
+            }
+
             imagesInDir[0] = firstImg;
             imageLocations[0] = images[0].getAbsolutePath();
             imageNames[0] = images[0].getName();
@@ -300,7 +311,12 @@ public class NewProjectLayout extends VBox implements CreatorScene{
             double imageWidth = firstImg.getWidth();
 
             for(int i = 1; i < imagesInDir.length; i++){
-                Image currentImg = new Image("file:" + images[i].getAbsolutePath());
+                Image currentImg; // = new Image("file:" + images[i].getAbsolutePath());
+                if(Utils.checkIn(format.toLowerCase(), new String[]{"jpg", "png"})){
+                    currentImg = new Image("file:" + images[i].getAbsolutePath());
+                }else{
+                    currentImg = Utils.readUnusualImage(images[i].getAbsolutePath());
+                }
 
                 if(currentImg.getWidth() != imageWidth || currentImg.getHeight() != imageHeight){
                     Main.showFileReadingAlert("The width and height of all images in the folder do not match.");
@@ -308,9 +324,8 @@ public class NewProjectLayout extends VBox implements CreatorScene{
                     return;
                 }
 
-                String name = images[i].getName().toLowerCase();
-                if((name.endsWith(".png") && format.equals("jpg")) ||
-                        (name.endsWith(".jpg") && format.equals("png"))){
+                String name = images[i].getName();
+                if(!Utils.getFileExtension(name).equals(format)){
                     Main.showFileReadingAlert("All images in folder must be of the same format.");
                     Main.hideLoadingDialog();
                     return;
@@ -323,9 +338,8 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
             selectedImages.clearTiles();
             rejectedImages.clearTiles();
-            resetPropertiesTable();
             loadImagesIntoPreview(imagesInDir, imageNames);
-            addWidthHeightToTable(imageWidth, imageHeight);
+            setWidthHeightFields(imagesInDir[0].getWidth(), imagesInDir[0].getHeight());
 
         }catch(Exception e){
             e.printStackTrace();
@@ -335,29 +349,11 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
 
-    private void addWidthHeightToTable(double width, double height){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                projectPropertyTableView.getItems().add(new ProjectProperty("Width",
-                        String.valueOf(width)));
 
-                projectPropertyTableView.getItems().add(new ProjectProperty("Height",
-                        String.valueOf(height)));
-            }
-        });
+    private void setWidthHeightFields(double width, double height){
+        imageWidthField.setText(String.valueOf((int)width));
+        imageHeightField.setText(String.valueOf((int)height));
     }
-
-
-
-    private void resetPropertiesTable(){
-        projectPropertyTableView.getItems().clear();
-
-        for(ProjectProperty property : rtiProject.getProjectProperties()){
-            projectPropertyTableView.getItems().add(property);
-        }
-    }
-
 
 
     private void loadImagesIntoPreview(Image[] images, String[] imageNames){
@@ -372,10 +368,8 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     public void setProject(RTIProject rtiProject){
         this.rtiProject = rtiProject;
         setupLayoutForType(rtiProject.getProjectType());
-        for(ProjectProperty property : rtiProject.getProjectProperties()){
-            projectPropertyTableView.getItems().add(property);
-        }
-
+        projectNameField.setText(rtiProject.getName());
+        projectTypeField.setText(rtiProject.getProjectType().toString());
     }
 
 
@@ -486,37 +480,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
 
-    public String[] getPropertyNamesLower(){
-        String[] names = new String[projectPropertyTableView.getItems().size()];
-
-        for(int i = 0; i < projectPropertyTableView.getItems().size(); i++){
-            names[i] = projectPropertyTableView.getItems().get(i).getField().toLowerCase();
-        }
-
-        for(String s : names){
-            System.out.println(s);
-        }
-
-        return names;
-    }
-
-    public void addProjectProperty(ProjectProperty property){
-        projectPropertyTableView.getItems().add(property);
-    }
-
-
-
-    public void deleteSelectedProperty(){
-        ProjectProperty selected = projectPropertyTableView.getSelectionModel().getSelectedItem();
-
-        if(Utils.checkIn(selected.getField(), new String[]{"Name", "Type", "Width", "Height"})){
-            Main.showInputAlert("Not allowed to delete that property.");
-            return;
-        }
-
-        rtiProject.getProjectProperties().remove(selected);
-        projectPropertyTableView.getItems().remove(selected);
-    }
 
     public TextArea getRemoveRsnTxtField() {
         return removeRsnTxtField;
@@ -546,9 +509,11 @@ public class NewProjectLayout extends VBox implements CreatorScene{
         selectedImages.addImageTile(tile);
     }
 
+    public void addTilesToSelected(ArrayList<ImageGridTile> tiles){
+        for(ImageGridTile tile : tiles){addTileToSelected(tile);}
+    }
 
     public void resetScene(){
-        projectPropertyTableView.getItems().clear();
         selectedImages.clearTiles();
         rejectedImages.clearTiles();
         removeRsnTxtField.setText("");
@@ -566,14 +531,6 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
     public File getImgsFolder() {
         return imgsFolder;
-    }
-
-    public File getAssemblyFileFolder() {
-        return assemblyFileFolder;
-    }
-
-    public File getLpFile() {
-        return lpFile;
     }
 
     public ScrollableImageGrid getSelectedImages(){

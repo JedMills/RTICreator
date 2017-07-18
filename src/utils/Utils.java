@@ -11,6 +11,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import main.ProjectType;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -210,6 +211,31 @@ public class Utils {
         return newImg;
     }
 
+
+    public static String getFileExtension(String fileName){
+        String[] parts = fileName.split("[.]");
+        return parts[parts.length - 1];
+    }
+
+    public static boolean fileExists(File dir, String filename){
+        String[] files = dir.list();
+        for(String file : files)
+            if(file.equals(filename))
+                return true;
+        return false;
+    }
+
+
+    public static Image readUnusualImage(String imagePath){
+        Image image = null;
+        try {
+            BufferedImage bufferedImage = ImageIO.read(new File(imagePath));
+            image = SwingFXUtils.toFXImage(bufferedImage, null);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return image;
+    }
 
 
     /**

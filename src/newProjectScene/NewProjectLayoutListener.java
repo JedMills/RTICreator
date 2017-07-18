@@ -53,12 +53,6 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                     LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.LP);
                 }
 
-            }else if(source.getId().equals("addPropertyButton")){
-                AddPropertyDialog.getInstance().show();
-
-            }else if(source.getId().equals("delPropertyButton")){
-                newProjectLayout.deleteSelectedProperty();
-
             }else if(source.getId().equals("removePicButton")){
                 String comment = newProjectLayout.getRemoveRsnTxtField().getText();
                 ImageGridTile tile = newProjectLayout.removeGridTileSelected();
@@ -81,7 +75,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 Main.backButtonPressed(newProjectLayout);
 
             }else if(source.getId().equals("nextBtn")){
-                if(newProjectLayout.getProjectType().equals(ProjectType.DOME_LP)){
+                if(newProjectLayout.getProjectType().equals(ProjectType.LP)){
                     moveSceneDomeLP();
 
                 }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
@@ -130,7 +124,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                     handoverTiles = createGridTilesFromDir(selectedImagesFolder);
                 }
 
-                Main.changeToHighlightDetectionScene(handoverTiles, selectedImagesFolder);
+                Main.changeToHighlightDetectionScene(handoverTiles, true);
             }
         }).start();
     }
@@ -253,22 +247,29 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
 
 
                 String imgFolderPath = newProjectLayout.getImgsFolder().getAbsolutePath();
+                File imageParentDir = new File(imgFolderPath);
 
-                String fileName;
+                if(!imageParentDir.exists() || !imageParentDir.isDirectory()){
+                    Main.hideLoadingDialog();
+                    Main.showFileReadingAlert("Couldn't access the image file folder. Check that it still  " +
+                                            "exists and that its name hasn't changed.");
+                    return;
+                }
+
+                String imageName;
                 ArrayList<String> fileNames = new ArrayList<>();
-                File currentFile;
-                for(String s : newProjectLayout.getLpData().keySet()){
-                    fileName = new File(s).getName();
-                    currentFile = new File(imgFolderPath + "/" + fileName);
+                for(String imagePath : newProjectLayout.getLpData().keySet()){
+                    imageName = new File(imagePath).getName();
 
-                    if(!currentFile.exists() || currentFile.isDirectory()){
+                    if(!Utils.fileExists(imageParentDir, imageName)){
                         Main.hideLoadingDialog();
                         Main.showFileReadingAlert("Not all of the images specified in the " +
-                                "LP file were found in the image resources file.");
+                                "LP file were found in the image resources file. Check that all files are in " +
+                                "the directory (case sensitive).");
                         return;
                     }
 
-                    fileNames.add(fileName);
+                    fileNames.add(imageName);
                 }
 
                 ArrayList<ImageGridTile> selectedImages = newProjectLayout.getSelectedImages(fileNames);
