@@ -1,12 +1,26 @@
 package initialScene;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import main.Main;
 import main.ProjectType;
 import main.RTIProject;
+import newProjectScene.LoadProjRsrcsDialog;
 
 import java.io.File;
 
@@ -18,6 +32,7 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
     private static InitialSceneListener ourInstance = new InitialSceneListener();
 
     private InitialLayout initialLayout;
+    private LoadExistingLPDialog lpDialog;
 
     public static InitialSceneListener getInstance() {
         return ourInstance;
@@ -27,6 +42,7 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
     public void init(InitialLayout initialLayout){
         this.initialLayout = initialLayout;
+        lpDialog = new LoadExistingLPDialog();
     }
 
 
@@ -39,11 +55,24 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
                 if(checkInputs()){
                     ProjectType projectType = null;
 
-                    if(initialLayout.getHighlightProjBtn().isSelected()){projectType = ProjectType.HIGHLIGHT;}
-                    else if (initialLayout.getLpFileProjBtn().isSelected()){projectType = ProjectType.LP;}
+                    if(initialLayout.getHighlightProjBtn().isSelected()){
+                        projectType = ProjectType.HIGHLIGHT;
+                    }
+                    else if (initialLayout.getLpFileProjBtn().isSelected()){
+                        projectType = ProjectType.LP;
+                    }
+                    else if(initialLayout.getLpFileExistingProject().isSelected()){
+                        projectType = ProjectType.EXISTING_LP;
+                    }
 
                     RTIProject createdProject = new RTIProject(initialLayout.getProjectNameField().getText(), projectType);
-                    Main.changeToNewProjLayout(createdProject);
+
+                    if(projectType.equals(ProjectType.HIGHLIGHT) || projectType.equals(ProjectType.LP)) {
+                        Main.changeToNewProjLayout(createdProject);
+                    }else if(projectType.equals(ProjectType.EXISTING_LP)){
+                        Main.currentRTIProject = createdProject;
+                        lpDialog.show();
+                    }
                 }
             }
         }
@@ -55,7 +84,9 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
         boolean projectSelected = false;
 
-        if(initialLayout.getHighlightProjBtn().isSelected() ||initialLayout.getLpFileProjBtn().isSelected()){
+        if(initialLayout.getHighlightProjBtn().isSelected()         ||
+                initialLayout.getLpFileProjBtn().isSelected()       ||
+                initialLayout.getLpFileExistingProject().isSelected()){
             projectSelected = true;
         }
 
@@ -88,5 +119,6 @@ public class InitialSceneListener implements EventHandler<ActionEvent> {
 
         return validInput;
     }
+
 
 }

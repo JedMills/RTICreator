@@ -154,8 +154,15 @@ public class Main extends Application {
     public static void changeToCropExecuteScene(ArrayList<ImageGridTile> approvedTiles){
         ArrayList<ImageGridTile> clones = (ArrayList<ImageGridTile>) approvedTiles.clone();
         CropExecuteLayout.getInstance().setLPTiles(clones);
-        setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
-        CropExecuteLayout.getInstance().setFirstGridTileSelected();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                CropExecuteLayout.getInstance().setFirstGridTileSelected();
+                setCreatorStage(cropExecuteScene, CropExecuteLayout.getInstance());
+            }
+        });
+
+
     }
 
 
@@ -225,11 +232,12 @@ public class Main extends Application {
                 CropExecuteLayout.getInstance().resetScene();
 
             }else if(currentRTIProject.getProjectType().equals(ProjectType.HIGHLIGHT)){
-                System.out.println("Num grid tiles before change of scene: " + HighlightDetectionLayout.getInstance().getGridTiles().length);
                 setCreatorStage(highlightDetectionScene, HighlightDetectionLayout.getInstance());
-                System.out.println("Num grid tiles after change of scene: " + HighlightDetectionLayout.getInstance().getGridTiles().length);
                 CropExecuteLayout.getInstance().resetScene();
-                System.out.println("Num grid tiles after crop scene has been reset" + HighlightDetectionLayout.getInstance().getGridTiles().length);
+
+            }else if(currentRTIProject.getProjectType().equals(ProjectType.EXISTING_LP)){
+                CropExecuteLayout.getInstance().resetScene();
+                setCreatorStage(initialScene, InitialLayout.getInstance());
             }
 
 
@@ -242,13 +250,20 @@ public class Main extends Application {
 
     public static void backButtonPressed(CreatorScene creatorScene, ImageGridTile[] tilesToPass){
         if(creatorScene == CropExecuteLayout.getInstance()){
+
             ArrayList<ImageGridTile> tilesArray = new ArrayList<>();
             for(ImageGridTile tile : tilesToPass){tilesArray.add(tile);}
+
             if(currentRTIProject.getProjectType().equals(ProjectType.HIGHLIGHT)){
                 changeToHighlightDetectionScene(tilesArray, true);
+
             }else if(currentRTIProject.getProjectType().equals(ProjectType.LP)){
                 changeToNewProjLayout(Main.currentRTIProject);
                 NewProjectLayout.getInstance().addTilesToSelected(tilesArray);
+
+            }else if(currentRTIProject.getProjectType().equals(ProjectType.EXISTING_LP)){
+                backButtonPressed(creatorScene);
+
             }
         }else{
             backButtonPressed(creatorScene);

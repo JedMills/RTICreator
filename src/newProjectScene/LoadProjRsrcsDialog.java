@@ -23,6 +23,8 @@ import utils.Utils;
 
 import java.io.File;
 
+import static utils.Utils.linkDirButtonToTextField;
+
 /**
  * Created by Jed on 09-Jul-17.
  */
@@ -265,11 +267,17 @@ public class LoadProjRsrcsDialog {
 
 
     private void setButtonActions(){
-        linkDirButtonToTextField("Select project images folder", browseImgLocationHL, imgLocationFieldHL);
-        linkDirButtonToTextField("Select project images folder", browseImgLocationLP, imgLocationFieldLP);
+        linkDirButtonToTextField("Select project images folder",
+                browseImgLocationHL, imgLocationFieldHL, stage,true);
 
-        linkDirButtonToTextField("Select project output folder", browseAssemblyLocationHL, assemblyLocationFieldHL);
-        linkDirButtonToTextField("Select project output folder", browseAssemblyLocationLP, assemblyLocationFieldLP);
+        linkDirButtonToTextField("Select project images folder",
+                browseImgLocationLP, imgLocationFieldLP, stage, true);
+
+        linkDirButtonToTextField("Select project output folder",
+                browseAssemblyLocationHL, assemblyLocationFieldHL, stage, true);
+
+        linkDirButtonToTextField("Select project output folder",
+                browseAssemblyLocationLP, assemblyLocationFieldLP, stage, true);
 
         linkFileButtonToTextField("Select LP file", browseLPLocation, lpLocationField);
 
@@ -318,28 +326,13 @@ public class LoadProjRsrcsDialog {
 
 
 
-
-    private void linkDirButtonToTextField(String title, Button button, TextField textField){
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Main.directoryChooser.setTitle(title);
-                File file = Main.directoryChooser.showDialog(stage);
-
-                if(file != null){
-                    textField.setText(file.getAbsolutePath());
-                }
-            }
-        });
-    }
-
     private void linkFileButtonToTextField(String title, Button button, TextField textField){
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 Main.fileChooser.setTitle(title);
                 Main.fileChooser.getExtensionFilters().add(new
-                        FileChooser.ExtensionFilter("LP Files (*.lp)", "*.lp"));
+                        FileChooser.ExtensionFilter("LP Files (.lp)", "*.lp"));
                 File file = Main.fileChooser.showOpenDialog(stage);
 
                 if(file != null){

@@ -61,7 +61,6 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
             }else if(source.getId().equals("backButton")){
                 Main.backButtonPressed(cropExecuteLayout, cropExecuteLayout.getLpImagesGrid().getGridTiles());
-
             }
 
         }else if(event.getSource() instanceof CheckBox){

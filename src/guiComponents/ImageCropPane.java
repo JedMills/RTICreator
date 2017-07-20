@@ -140,8 +140,8 @@ public class ImageCropPane extends BorderPane{
 
 
     private void scaleRectPos(double deltaW, double deltaH){
-
         if(Double.isInfinite(deltaW) || Double.isInfinite(deltaH)){return;}
+
         bandSelection.topLeftHandle.setX(bandSelection.topLeftHandle.getX() * deltaW);
         bandSelection.topLeftHandle.setY(bandSelection.topLeftHandle.getY() * deltaH);
 
@@ -151,6 +151,8 @@ public class ImageCropPane extends BorderPane{
 
 
     private void updatedCirclesAndRect(){
+        if(image == null){return;}
+
         double newImageWidth = imageView.getBoundsInParent().getWidth();
         double newImageHeight = imageView.getBoundsInParent().getHeight();
 

@@ -1,7 +1,10 @@
 package utils;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -9,6 +12,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import main.Main;
 import main.ProjectType;
 
 import javax.imageio.ImageIO;
@@ -19,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Created by Jed on 09-Jul-17.
@@ -48,6 +55,16 @@ public class Utils {
     public static boolean checkIn(String string, ArrayList<String> strings){
         for(String s : strings) {
             if (s.equals(string)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static boolean checkIn(String string, Set<String> strings){
+        for(String s : strings){
+            if(s.equals(string)){
                 return true;
             }
         }
@@ -104,6 +121,11 @@ public class Utils {
 
 
             lineItems = line.split("\\s+");
+
+            if(lineItems.length > 4){
+                throw new LPException("Error parsing lp data on line: " + currentLine + ", check there are no " +
+                                        "spaces in the specified file paths or names.");
+            }
 
             try{
                 fileName = lineItems[0];
@@ -236,6 +258,70 @@ public class Utils {
         }
         return image;
     }
+
+
+    public static class IntHolder{
+        private int value;
+
+        public IntHolder(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public void pp(){
+            value ++;
+        }
+
+        public void mm(){
+            value --;
+        }
+    }
+
+
+
+    public static void linkDirButtonToTextField(String title, Button button, TextField textField, Stage stage, boolean folder){
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                File file = null;
+                if(folder) {
+                    Main.directoryChooser.setTitle(title);
+                    file = Main.directoryChooser.showDialog(stage);
+                }else{
+                    Main.fileChooser.setTitle(title);
+                    file = Main.fileChooser.showOpenDialog(stage);
+                }
+
+                if(file == null){return;}
+
+                if(Utils.containsSpaces(file.getAbsolutePath())){
+                    Main.showInputAlert("Please ensure there are no spaces in directory or file names.");
+                    return;
+                }
+
+                textField.setText(file.getAbsolutePath());
+
+            }
+        });
+    }
+
+
+    public static void linkDirButtonToTextField(String title, Button button, TextField textField, Stage stage,
+                                                            String extDesc, String fileExt){
+        Main.fileChooser.getExtensionFilters().clear();
+        Main.fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(extDesc, fileExt));
+        linkDirButtonToTextField(title, button, textField, stage, false);
+    }
+
+
+
 
 
     /**

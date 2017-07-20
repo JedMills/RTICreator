@@ -131,6 +131,7 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
 
                 for(ImageGridTile tile : gridTiles){gridTileSet.add(tile);}
 
+                Utils.IntHolder numRejected = new Utils.IntHolder(0);
                 gridTileSet.parallelStream().forEach(new Consumer<ImageGridTile>() {
                     @Override
                     public void accept(ImageGridTile tile) {
@@ -138,11 +139,30 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
 
                         Vector3f highlight = getHighlightVec(xyrt[0], xyrt[1], xyrt[2], xyrt[3], image);
 
-                        lpData.put(tile.getName(), highlight);
+
+                        if(vectorOK(highlight)){
+                            lpData.put(tile.getName(), highlight);
+                        }else {
+                            numRejected.pp();
+
+                        }
                     }
                 });
 
                 Main.hideLoadingDialog();
+
+                if(!(numRejected.getValue() == 0)){
+                    if(numRejected.getValue() == gridTiles.length){
+                        Main.showInputAlert("No highlights could be detected in any of the images. Please " +
+                                            "retry with different images or settings.");
+                        return;
+                    }else{
+                        Main.showInputAlert(numRejected.getValue() + " images were removed from image selection " +
+                                "as highlights in these could not be calculated.");
+                    }
+                }
+
+                
 
                 Main.showLoadingDialog("Creating new LP file...");
                 File lpFile = writeLPDataToFile(lpData);
@@ -151,8 +171,13 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
 
                 Main.currentLPFile = lpFile;
 
+
                 ArrayList<ImageGridTile> gridTilesArray = new ArrayList<>();
-                for(ImageGridTile gridTile : gridTiles){gridTilesArray.add(gridTile);}
+                for(ImageGridTile gridTile : gridTiles){
+                    if(Utils.checkIn(gridTile.getName(), lpData.keySet())) {
+                        gridTilesArray.add(gridTile);
+                    }
+                }
 
                 Main.hideLoadingDialog();
 
@@ -168,6 +193,24 @@ public class HighlightDetectionLayoutListener implements EventHandler<ActionEven
             }
         }).start();
     }
+
+
+    private boolean vectorOK(Vector3f vector3f){
+        if(     Float.isNaN(vector3f.getX())        ||
+                Float.isNaN(vector3f.getY())        ||
+                Float.isNaN(vector3f.getZ())        ||
+                Float.isInfinite(vector3f.getX())   ||
+                Float.isInfinite(vector3f.getY())   ||
+                Float.isInfinite(vector3f.getZ()) ){
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+
 
 
     private File writeLPDataToFile(HashMap<String, Vector3f> lpData){

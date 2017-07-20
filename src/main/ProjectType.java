@@ -6,7 +6,8 @@ package main;
 public enum ProjectType {
 
     HIGHLIGHT   ("Highlight based"),
-    LP     ("LP file");
+    LP     ("LP file"),
+    EXISTING_LP ("LP file from existing project");
 
     private String label;
 

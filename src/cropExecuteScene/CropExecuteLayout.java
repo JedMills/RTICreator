@@ -476,7 +476,6 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
 
         return imageName.split("[.]")[1];
-        //return imageName.substring(imageName.length() - 3);
     }
 
 

@@ -8,7 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import main.CreatorScene;
 import main.Main;
-import main.ProjectType;
 
 /**
  * Created by Jed on 06-Jul-17.
@@ -18,6 +17,7 @@ public class InitialLayout extends VBox implements CreatorScene {
     private Image rtiLogo;
     private RadioButton highlightProjBtn;
     private RadioButton lpFileProjBtn;
+    private RadioButton lpFileExistingProject;
     private Button startNewProjectBtn;
     private TextField projectNameField;
 
@@ -66,12 +66,16 @@ public class InitialLayout extends VBox implements CreatorScene {
 
 
         ToggleGroup toggleGroup = new ToggleGroup();
-        highlightProjBtn = new RadioButton("Highlight - detection");
+        highlightProjBtn = new RadioButton("Highlight detection");
         highlightProjBtn.setToggleGroup(toggleGroup);
-        lpFileProjBtn = new RadioButton("Existing LP File");
+        lpFileProjBtn = new RadioButton("LP file - image folder");
         lpFileProjBtn.setToggleGroup(toggleGroup);
+        lpFileExistingProject = new RadioButton("LP file - full paths");
+        lpFileExistingProject.setToggleGroup(toggleGroup);
 
-        projTypeBox.getChildren().addAll(projectOptionsLabel, createSpacer(), highlightProjBtn, createSpacer(), lpFileProjBtn, createSpacer());
+        projTypeBox.getChildren().addAll(projectOptionsLabel, createSpacer(), highlightProjBtn,
+                                        createSpacer(), lpFileProjBtn, createSpacer(),
+                                            lpFileExistingProject, createSpacer());
         projTypeBox.setSpacing(10);
         projTypeBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -145,5 +149,9 @@ public class InitialLayout extends VBox implements CreatorScene {
 
     public TextField getProjectNameField() {
         return projectNameField;
+    }
+
+    public RadioButton getLpFileExistingProject() {
+        return lpFileExistingProject;
     }
 }
