@@ -15,6 +15,7 @@ import utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Jed on 11-Jul-17.
@@ -56,6 +57,9 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
     private TextArea fitterOutputArea;
 
     private boolean useCrop;
+
+    private String ptmFitterLocation;
+    private String hshFitterLocation;
 
 
     private static CropExecuteLayout ourInstance = new CropExecuteLayout();
@@ -445,12 +449,22 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
         fitterOptionsGrid.getChildren().clear();
         fitterOptionsGrid.getChildren().addAll(fitterTypeLabel, ptmButton, hshButton);
         fitterOptionsGrid.getChildren().addAll(ptmTypeLabel, ptmRGBButton, ptmLRGBButton);
+
+        Preferences prefs = Preferences.userNodeForPackage(CropExecuteLayout.class);
+        ptmFitterLocation = prefs.get("ptmFitterLocation", "");
+
+        fitterLocationField.setText(ptmFitterLocation);
     }
 
     public void setHSHOptions(){
         fitterOptionsGrid.getChildren().clear();
         fitterOptionsGrid.getChildren().addAll(fitterTypeLabel, ptmButton, hshButton);
         fitterOptionsGrid.getChildren().addAll(hshTermsLabel, hshTerms2, hshTerms3);
+
+        Preferences prefs = Preferences.userNodeForPackage(CropExecuteLayout.class);
+        hshFitterLocation = prefs.get("hshFitterLocation", "");
+
+        fitterLocationField.setText(hshFitterLocation);
     }
 
     public boolean isUseCrop() {
@@ -485,6 +499,14 @@ public class CropExecuteLayout extends VBox implements CreatorScene {
 
     public void setFitterLocation(String location){
         fitterLocationField.setText(location);
+
+        Preferences prefs = Preferences.userNodeForPackage(CropExecuteLayout.class);
+
+        if(ptmSelected()){
+            prefs.put("ptmFitterLocation", location);
+        }else if(hshSelected()){
+            prefs.put("hshFitterLocation", location);
+        }
     }
 
     public String getOutputLocation(){
