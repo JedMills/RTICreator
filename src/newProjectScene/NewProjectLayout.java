@@ -2,14 +2,12 @@ package newProjectScene;
 
 import guiComponents.ImageGridTile;
 import guiComponents.ScrollableImageGrid;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -373,11 +371,11 @@ public class NewProjectLayout extends VBox implements CreatorScene{
     }
 
 
-    private void setupLayoutForType(ProjectType type){
+    private void setupLayoutForType(RTIProject.ProjectType type){
         mainLayout.getChildren().clear();
         getChildren().clear();
 
-        if(type.equals(ProjectType.HIGHLIGHT)){
+        if(type.equals(RTIProject.ProjectType.HIGHLIGHT)){
             mainLayout.getChildren().addAll(toolbarLayout, selectedImages, removePicPane, rejectedImages);
         }else{
             mainLayout.getChildren().addAll(toolbarLayout, selectedImages);
@@ -475,7 +473,7 @@ public class NewProjectLayout extends VBox implements CreatorScene{
 
 
 
-    public ProjectType getProjectType(){
+    public RTIProject.ProjectType getProjectType(){
         return rtiProject.getProjectType();
     }
 

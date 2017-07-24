@@ -26,46 +26,93 @@ import java.io.File;
 import static utils.Utils.linkDirButtonToTextField;
 
 /**
- * Created by Jed on 09-Jul-17.
+ * The dialog that is shown when the 'Open Project Resources' button is clicked. This class is responsible for checking
+ * the resources passed.
+ *
+ * @author Jed Mills
  */
 public class LoadProjRsrcsDialog {
 
+    /** The NewProjectLayout that this dialog was created from */
     private NewProjectLayout newProjectLayout;
 
+    /** The window for this dialog */
     private Stage stage;
+
+    /** The layout that will be shown if the current project is highlight based*/
     private Scene highlightLayout;
+
+    /** The layout that will be shown if the current project is lp file based*/
     private Scene lpLayout;
 
+    /** 'Browse' button for finding the image folder location for highlight based projects*/
     private Button browseImgLocationHL;
+
+    /** Field that displays the selected folder for image file in a highlight based project */
     private TextField imgLocationFieldHL;
+
+    /** 'Browse' button for finding the location of the folder for assembly files for a highlight based project */
     private Button browseAssemblyLocationHL;
+
+    /** Field that displays the selected folder for assembly files in a highlight based project */
     private TextField assemblyLocationFieldHL;
 
+    /** 'Browse' button for finding the image folder location for lp file projects*/
     private Button browseImgLocationLP;
+
+    /** Field that displays the selected folder for image file in a lp file project */
     private TextField imgLocationFieldLP;
+
+    /** 'Browse' button for finding the location of the folder for assembly files for a lp file project */
     private Button browseAssemblyLocationLP;
+
+    /** Field that displays the selected folder for assembly files in a lp file  project */
     private TextField assemblyLocationFieldLP;
+
+    /** 'Browse' button for finding the location of the lp file for a lp file project */
     private Button browseLPLocation;
+
+    /** Field that displays the selected lp file in a lp file  project */
     private TextField lpLocationField;
 
+    /** Ok button for the highlight project layout */
     private Button okButtonHL;
+
+    /** Cancel button for the highlight project layout */
     private Button cancelButtonHL;
 
+    /** Ok button for the lp project layout */
     private Button okButtonLP;
+
+    /** Cancel button for the lp project layout */
     private Button cancelButtonLP;
 
+    /** All the text field for convenietnyl checking etc. */
     private TextField[] textFields;
 
-
+    /** The two different layout ypes*/
     public enum DialogType{HIGHLIGHT, LP;}
 
+    /** The singleton instance of this class*/
     private static LoadProjRsrcsDialog ourInstance = new LoadProjRsrcsDialog();
 
+
+
+    /**
+     * @return {@link LoadProjRsrcsDialog#ourInstance}
+     */
     public static LoadProjRsrcsDialog getInstance() {
         return ourInstance;
     }
 
+
+
+
+    /**
+     * Creates a new LoadProjRsrcsDialog.
+     */
     private LoadProjRsrcsDialog() {
+        //create the window
         stage = new Stage(StageStyle.UNIFIED);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(Main.primaryStage);
@@ -75,14 +122,14 @@ public class LoadProjRsrcsDialog {
 
         stage.getIcons().add(Main.thumbnail);
 
+        //make the components for the two layouts
         initComponents();
         highlightLayout = new Scene(createHighlightLayout());
         highlightLayout.getStylesheets().add("stylesheets/default.css");
         lpLayout = new Scene(createLPLayout());
         lpLayout.getStylesheets().add("stylesheets/default.css");
 
-
-
+        //for the components to change size upon resize
         stage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -92,11 +139,24 @@ public class LoadProjRsrcsDialog {
 
     }
 
+
+
+
+    /**
+     * @param newProjectLayout the layout that thisDialog belongs to
+     */
     public void init(NewProjectLayout newProjectLayout){
         this.newProjectLayout = newProjectLayout;
     }
 
 
+
+
+    /**
+     * Sets the text field pref widths to the width so they fill up all available width of the dialog.
+     *
+     * @param width     width of the dialog window
+     */
     private void setTextBoxWidths(Number width){
         if(width instanceof Double) {
             for (TextField textField : textFields) {
@@ -106,7 +166,13 @@ public class LoadProjRsrcsDialog {
     }
 
 
+
+
+    /**
+     * Creates all the components for the two layout types.
+     */
     private void initComponents(){
+        //just create all the components nothing fancy here
         imgLocationFieldHL = new TextField();
         browseImgLocationHL = new Button("Browse");
         assemblyLocationFieldHL = new TextField();
@@ -125,7 +191,7 @@ public class LoadProjRsrcsDialog {
         okButtonLP = new Button("OK");
         cancelButtonLP = new Button("Cancel");
 
-         textFields =  new TextField[]{imgLocationFieldLP, imgLocationFieldHL, assemblyLocationFieldLP,
+        textFields =  new TextField[]{imgLocationFieldLP, imgLocationFieldHL, assemblyLocationFieldLP,
                 assemblyLocationFieldHL, lpLocationField};
 
         for(TextField textField : textFields){
@@ -142,6 +208,12 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Crete the layout that is shown when the project is highlight based, so has a selector for the images folder
+     * and the assembly folder.
+     *
+     * @return  the highlight project layout
+     */
     private VBox createHighlightLayout(){
         VBox vBox = new VBox();
         GridPane gridPane = new GridPane();
@@ -157,6 +229,13 @@ public class LoadProjRsrcsDialog {
         return vBox;
     }
 
+
+    /**
+     * Crete the layout that is shown when the project is lp-file based, so has a selector for the images folder
+     * and the assembly folder, and a selector for the lp file.
+     *
+     * @return  the lp file project layout
+     */
     private VBox createLPLayout(){
         VBox vBox = new VBox();
         GridPane gridPane = new GridPane();

@@ -31,26 +31,45 @@ import java.util.HashMap;
 import static utils.Utils.linkDirButtonToTextField;
 
 /**
- * Created by Jed on 19-Jul-17.
+ * Dialog that is shown if the user selects the LP project using full file paths in the {@link InitialLayout}. Used
+ * for selecting the lp file path and assembly folder.
+ *
+ * @see InitialLayout
+ *
+ * @author Jed Mills
  */
 public class LoadExistingLPDialog {
 
+    /** Window that this dialog exist in*/
     private Stage stage;
+
+    /** Field where the path for the chosen lp file goes */
     private TextField lpField;
-    private Button browseLPLoc;
+
+    /** Field where the path for the assembly folder goes */
     private TextField assemblyField;
-    private Button browseAssemblyLoc;
+
+    /** 'OK' button */
     private Button okButton;
+
+    /** *@Cancel' button */
     private Button cancelButton;
 
+    /**
+     * Creates a new LoadExistingLPDialog, adds listeners for the window's width property so the text fields
+     * expand to fill the width.
+     */
     public LoadExistingLPDialog(){
+        //create a new window
         stage = new Stage(StageStyle.UNIFIED);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(Main.primaryStage);
         stage.setTitle("Load LP From Existing Project");
 
+        //give it the RTI logo in the corner
         stage.getIcons().add(Main.thumbnail);
 
+        //create the fields and labels and buttons
         VBox layout = createLayout();
         Scene scene = new Scene(layout);
         scene.getStylesheets().add("stylesheets/default.css");
@@ -61,6 +80,7 @@ public class LoadExistingLPDialog {
         stage.setMinWidth(400);
         stage.setMaxWidth(700);
 
+        //make the text fields expand to fit the width of the stage
         stage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -74,11 +94,19 @@ public class LoadExistingLPDialog {
         stage.setScene(scene);
     }
 
+
+    /**
+     * Creates all the content and widgets in this dialog.
+     *
+     * @return  the VBox containing all the fields and buttons and labels
+     */
     private VBox createLayout(){
+        //contains all the stuff
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
 
+            //contains the labels, fields and browse buttons for the lp and assembly folder location
             GridPane gridPane = new GridPane();
 
                 Label lpLabel = new Label("LP file:");
@@ -87,7 +115,7 @@ public class LoadExistingLPDialog {
 
                 lpField = createField(1, 0);
 
-                browseLPLoc = new Button("Browse");
+                Button browseLPLoc = new Button("Browse");
                 browseLPLoc.setMinWidth(Button.USE_PREF_SIZE);
                 linkDirButtonToTextField("Select LP File", browseLPLoc, lpField, stage,
                         "LP Files (.lp)", "*.lp");
@@ -99,7 +127,7 @@ public class LoadExistingLPDialog {
 
                 assemblyField = createField(1, 1);
 
-                browseAssemblyLoc = new Button("Browse");
+                Button browseAssemblyLoc = new Button("Browse");
                 browseAssemblyLoc.setMinWidth(Button.USE_PREF_SIZE);
                 linkDirButtonToTextField("Select Folder For Assembly Files",
                                                     browseAssemblyLoc, assemblyField, stage, true);
@@ -112,6 +140,7 @@ public class LoadExistingLPDialog {
             gridPane.setPadding(new Insets(5, 5, 5, 5));
             gridPane.getStyleClass().add("defaultBorder");
 
+            //contains the ok and cancel buttons
             HBox hBox = new HBox();
 
                 okButton = new Button("OK");
@@ -132,7 +161,10 @@ public class LoadExistingLPDialog {
     }
 
 
-
+    /**
+     * Sets the action for th e 'OK' button,. which checks the lp file is a rel file, and attempts to load the
+     * LP data before moving to the {@link cropExecuteScene.CropExecuteLayout}.
+     */
     private void setOkButtonAction() {
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -147,7 +179,16 @@ public class LoadExistingLPDialog {
         });
     }
 
+
+    /**
+     * Reads the lp data in the file, loading the images in the locations given, and handing these to the
+     * {@link cropExecuteScene.CropExecuteLayout}, whihc the program will switch to if all this is
+     * successful.
+     *
+     * @see cropExecuteScene.CropExecuteLayout
+     */
     private void loadLPData(){
+        //checj the user has actually chosen things for the fields
         if(Utils.haveEmptyField(lpField, assemblyField)){
             Main.showInputAlert("Please select locations for the LP file and assembly folder.");
             return;
@@ -156,6 +197,7 @@ public class LoadExistingLPDialog {
         File lpFile = new File(lpField.getText());
         File assemblyFile = new File(assemblyField.getText());
 
+        //check the specified file/folder actually exist
         if(!lpFile.exists() || !assemblyFile.exists()){
             Main.showInputAlert("Couldn't find the specified resources. Please check that they " +
                     "still exist and have the correct format.");
@@ -164,19 +206,25 @@ public class LoadExistingLPDialog {
 
         Main.showLoadingDialog("Loading LP file...");
 
+        //read the lpdata from the file
         HashMap<String, Utils.Vector3f> lpData;
         try {
             lpData = Utils.readLPFile(lpFile);
+
         }catch(IOException e){
+            //error actually accessing the file
             Main.showFileReadingAlert("Error accessing LP file. Check that it still exists.");
             Main.hideLoadingDialog();
             return;
+
         }catch(Utils.LPException e){
+            //error when parsing the lp data
             Main.showFileReadingAlert("Error reading LP file: " + e.getMessage());
             Main.hideLoadingDialog();
             return;
         }
 
+        //will now create an array of image grid tiles which will be passed to the CropExecuteLayout
         ArrayList<ImageGridTile> gridTiles = new ArrayList<>();
         for(String imagePath : lpData.keySet()){
             File imageFile = new File(imagePath);
@@ -190,8 +238,10 @@ public class LoadExistingLPDialog {
             String imageExt = Utils.getFileExtension(imageFile.getName());
             Image image;
             if(Utils.checkIn(imageExt.toLowerCase(), new String[]{"jpg", "png"})){
+                //jpegs and pngs are easy to load
                 image = new Image("file:" + imagePath);
             }else{
+                //otherwise we need to use the JAI API to load them
                 image = Utils.readUnusualImage(imagePath);
             }
 
@@ -202,12 +252,13 @@ public class LoadExistingLPDialog {
                 return;
             }
 
+            //if we've succesfully loaded the image, create a grid tile from it and the name in the lp file
             ImageGridTile gridTile = new ImageGridTile(null, imageFile.getName(), image, 150,
                     150, false, true, true);
             gridTiles.add(gridTile);
         }
 
-
+        //the folders that the CropExecuteLayout need to know about
         Main.currentAssemblyFolder = assemblyFile;
         Main.currentLPFile = lpFile;
 
@@ -220,9 +271,12 @@ public class LoadExistingLPDialog {
             }
         });
         Main.changeToCropExecuteScene(gridTiles);
-
     }
 
+
+    /**
+     * Sets the action when the cancel button is clicked: close the dialog without doing anything.
+     */
     private void setCancelButtonAction(){
         cancelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -240,7 +294,9 @@ public class LoadExistingLPDialog {
     }
 
 
-
+    /**
+     * Show this dialog on the JavaFX thread.
+     */
     public void show(){
         Platform.runLater(new Runnable() {
             @Override
@@ -251,8 +307,13 @@ public class LoadExistingLPDialog {
     }
 
 
-
-
+    /**
+     * Convenience method for creating a TextField in a GridPane.
+     *
+     * @param col   column in the grid
+     * @param row   row in the grid
+     * @return      the new TextField
+     */
     private TextField createField(int col, int row){
         TextField textField = new TextField();
         textField.setEditable(false);

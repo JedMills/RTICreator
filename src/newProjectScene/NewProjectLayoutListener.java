@@ -1,14 +1,12 @@
 package newProjectScene;
 
 import guiComponents.ImageGridTile;
-import guiComponents.ScrollableImageGrid;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import main.Main;
-import main.ProjectType;
+import main.RTIProject;
 import utils.Utils;
 
 import javax.imageio.ImageIO;
@@ -47,7 +45,7 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
             Button source = (Button) event.getSource();
 
             if(source.getId().equals("openFolder")){
-                if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
+                if(newProjectLayout.getProjectType().equals(RTIProject.ProjectType.HIGHLIGHT)){
                     LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.HIGHLIGHT);
                 }else{
                     LoadProjRsrcsDialog.getInstance().show(LoadProjRsrcsDialog.DialogType.LP);
@@ -75,10 +73,10 @@ public class NewProjectLayoutListener implements EventHandler<ActionEvent> {
                 Main.backButtonPressed(newProjectLayout);
 
             }else if(source.getId().equals("nextBtn")){
-                if(newProjectLayout.getProjectType().equals(ProjectType.LP)){
+                if(newProjectLayout.getProjectType().equals(RTIProject.ProjectType.LP)){
                     moveSceneDomeLP();
 
-                }else if(newProjectLayout.getProjectType().equals(ProjectType.HIGHLIGHT)){
+                }else if(newProjectLayout.getProjectType().equals(RTIProject.ProjectType.HIGHLIGHT)){
                     moveSceneHighlight();
 
                 }

@@ -15,7 +15,6 @@ import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import main.Main;
-import main.ProjectType;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -31,17 +30,6 @@ import java.util.Set;
  * Created by Jed on 09-Jul-17.
  */
 public class Utils {
-
-
-    public static boolean checkIn(ProjectType projectType, ProjectType[] projectTypes){
-        for(ProjectType type : projectTypes) {
-            if (type.equals(projectType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public static boolean checkIn(String string, String[] strings){
         for(String s : strings) {
@@ -210,12 +198,6 @@ public class Utils {
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         spacer.setMinSize(1, 1);
-        return spacer;
-    }
-
-    public static Pane createSpacer(int maxWidth){
-        Pane spacer = createSpacer();
-        spacer.setMaxWidth(maxWidth);
         return spacer;
     }
 
