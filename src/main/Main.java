@@ -109,8 +109,8 @@ public class Main extends Application {
 
 
     /**
-     * Runs the app. Creates the scenes from the layouts, bins the width and height of the window to the update
-     * size methods of the scenes. Shows the main window with the {@link InitialLayout}
+     * Runs the app. Creates the scenes from the layouts, binds the width and height of the window to the update
+     * size methods of the scenes. Shows the main window with the {@link InitialLayout}.
      *
      * @param primaryStage  the window fo the app
      * @throws Exception    if the window can't be created
@@ -441,12 +441,16 @@ public class Main extends Application {
             stage.setScene(scene);
         }
 
+
+
         /**
          * Shows the dialog box.
          */
         public void show(){
             stage.show();
         }
+
+
 
         /**
          * Hides the dialog box.
@@ -455,8 +459,10 @@ public class Main extends Application {
             stage.hide();
         }
 
+
+
         /**
-         * @param text the text of the dialog to set above the progress indicator
+         * @param text the text of the dialog to set above the progress indicator on the JavaFx thread
          */
         public void setText(String text) {
             Platform.runLater(new Runnable() {
@@ -466,6 +472,8 @@ public class Main extends Application {
                 }
             });
         }
+
+
 
         /**
          * Brings the loading dialog above all the other windows.

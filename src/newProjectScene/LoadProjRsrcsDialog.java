@@ -27,7 +27,9 @@ import static utils.Utils.linkDirButtonToTextField;
 
 /**
  * The dialog that is shown when the 'Open Project Resources' button is clicked. This class is responsible for checking
- * the resources passed.
+ * the resources passed. It has different layout depending on what project type the user is making.
+ *
+ * @see main.RTIProject.ProjectType
  *
  * @author Jed Mills
  */
@@ -90,7 +92,7 @@ public class LoadProjRsrcsDialog {
     /** All the text field for convenietnyl checking etc. */
     private TextField[] textFields;
 
-    /** The two different layout ypes*/
+    /** The two different layout types*/
     public enum DialogType{HIGHLIGHT, LP;}
 
     /** The singleton instance of this class*/
@@ -253,6 +255,11 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Convenience method to format a GridPane
+     *
+     * @param gridPane      pane to format
+     */
     private void setGridPaneLayout(GridPane gridPane){
         gridPane.setPadding(new Insets(5, 5, 5, 5));
         gridPane.setHgap(10);
@@ -260,15 +267,27 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Adds the difference version of the images location label, field and button to the type of project the the use is
+     * currently making. A difference instances of these classes was used for the different project types out of
+     * convenience.
+     *
+     * @param type          project type the user is making
+     * @param gridPane      gris pane the image folder selection components belong to
+     * @param rowNum        row of the prod pane they should be placed in
+     */
     private void addImagesLocationComponents(DialogType type, GridPane gridPane, int rowNum){
+        //both project layout has the same label
         Label imagesLabel = new Label("Image folder:");
         imagesLabel.setMinWidth(imagesLabel.USE_PREF_SIZE);
         GridPane.setConstraints(imagesLabel, 0, rowNum, 1, 1);
 
+        //but a different text field and button were used for convenience
         if(type.equals(DialogType.HIGHLIGHT)) {
             GridPane.setConstraints(imgLocationFieldHL, 1, rowNum, 1, 1);
             GridPane.setConstraints(browseImgLocationHL, 2, rowNum, 1, 1);
             gridPane.getChildren().addAll(imagesLabel, imgLocationFieldHL, browseImgLocationHL);
+
         }else if(type.equals(DialogType.LP)){
             GridPane.setConstraints(imgLocationFieldLP, 1, rowNum, 1, 1);
             GridPane.setConstraints(browseImgLocationLP, 2, rowNum, 1, 1);
@@ -277,15 +296,27 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Adds the difference version of the assembly folder location label, field and button to the type of project
+     * the the use is currently making. A difference instances of these classes was used for the different project
+     * types out of convenience.
+     *
+     * @param type          project type the user is making
+     * @param gridPane      grid pane the assembly folder selection components belong to
+     * @param rowNum        row of the prod pane they should be placed in
+     */
     private void addOutFolderLocationComponents(DialogType type, GridPane gridPane, int rowNum){
+        //both project layout has the same label
         Label outLabel = new Label("Folder for assembly files:");
         outLabel.setMinWidth(outLabel.USE_PREF_SIZE);
         GridPane.setConstraints(outLabel, 0, rowNum, 1, 1);
 
+        //but a different text field and button were used for convenience
         if(type.equals(DialogType.HIGHLIGHT)) {
             GridPane.setConstraints(assemblyLocationFieldHL, 1, rowNum, 1, 1);
             GridPane.setConstraints(browseAssemblyLocationHL, 2, rowNum, 1, 1);
             gridPane.getChildren().addAll(outLabel, assemblyLocationFieldHL, browseAssemblyLocationHL);
+
         }else if(type.equals(DialogType.LP)){
             GridPane.setConstraints(assemblyLocationFieldLP, 1, rowNum, 1, 1);
             GridPane.setConstraints(browseAssemblyLocationLP, 2, rowNum, 1, 1);
@@ -294,6 +325,13 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Adds the lp file label, text field and browse button to the grid pane in the given row, used for setting up the
+     * dialog in lp file format.
+     *
+     * @param gridPane      grid pane the lp file selection components belong to
+     * @param rowNum        row of the prod pane they should be placed in
+     */
     private void addLPFileLocationComponents(GridPane gridPane, int rowNum){
         Label lpLabel = new Label("LP file:");
         lpLabel.setMinWidth(lpLabel.USE_PREF_SIZE);
@@ -306,11 +344,19 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Creates and return the bar containing the 'OK' and 'Cancel' buttons at the bottom of the dialog. Different
+     * instances of these buttons exist for the different types as they have different functions.
+     *
+     * @param type      the type of project
+     * @return          the button bar for the bottom of the dialog
+     */
     private HBox createButtonBar(DialogType type){
         HBox hBox = new HBox();
 
         if(type.equals(DialogType.LP)){
             hBox.getChildren().addAll(okButtonLP, cancelButtonLP);
+
         }else if(type.equals(DialogType.HIGHLIGHT)){
             hBox.getChildren().addAll(okButtonHL, cancelButtonHL);
         }
@@ -323,19 +369,28 @@ public class LoadProjRsrcsDialog {
     }
 
 
-
+    /**
+     * Shows the load project resources dialog, with the layout  corresponding to the given type, on the JavaFX thread.
+     *
+     * @param dialogType
+     */
     public void show(DialogType dialogType){
         int height = 0;
+
         if(dialogType.equals(DialogType.HIGHLIGHT)){
             height = 163;
             stage.setScene(highlightLayout);
+
         }else if(dialogType.equals(DialogType.LP)){
+            //the lp dialog is taller as it has an extra two of components
             height = 198;
             stage.setScene(lpLayout);
         }
+
         stage.setMaxHeight(height);
         stage.setMinHeight(height);
 
+        //show the dialog on the JavaFX thread
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -345,7 +400,12 @@ public class LoadProjRsrcsDialog {
     }
 
 
+    /**
+     * Sets the actions of all buttons for all project types in the dialog.
+     */
     private void setButtonActions(){
+        //link the browse buttons to their text fields so that the selected file from the file choose that
+        //opens with the browse button goes in the text field
         linkDirButtonToTextField("Select project images folder",
                 browseImgLocationHL, imgLocationFieldHL, stage,true);
 
@@ -360,7 +420,7 @@ public class LoadProjRsrcsDialog {
 
         linkFileButtonToTextField("Select LP file", browseLPLocation, lpLocationField);
 
-
+        //the cancel buttons just closes the dialog
         EventHandler<ActionEvent> close = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -372,24 +432,38 @@ public class LoadProjRsrcsDialog {
         cancelButtonLP.setOnAction(close);
         cancelButtonHL.setOnAction(close);
 
+        //the ok buttons are more complicated as it they to check resources and stuff
         okButtonHL.setOnAction(createOKButtonHandler(imgLocationFieldHL, assemblyLocationFieldHL));
         okButtonLP.setOnAction(createOKButtonHandler(imgLocationFieldLP, lpLocationField, assemblyLocationFieldLP));
     }
 
 
+
+
+    /**
+     * Creates the action handler for the two version of the OK button. These buttons check the user has actually
+     * chosen files for the fields, and then checks and loads the specified resources
+     *
+     * @param fields        the OK buttons to set the action of
+     * @return
+     */
     private EventHandler<ActionEvent> createOKButtonHandler(TextField... fields){
         EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                //check the user has actually chosen the files for the fields
                 if(Utils.haveEmptyField(fields)){
                     Main.showInputAlert("Please select all fields.");
 
                 }else if(Utils.containsSpaces(fields)){
+                    //check there ar eno spaces
                     Main.showInputAlert("Please ensure there are no spaces in the file paths provided.");
 
                 }else{
+                    //if that's all ok, load the resources
                     if(fields.length == 2) {
-                        newProjectLayout.setResources(imgLocationFieldHL.getText(), assemblyLocationFieldHL.getText());
+                        newProjectLayout.setResources(imgLocationFieldHL.getText(),
+                                                        assemblyLocationFieldHL.getText());
                     }else if(fields.length == 3){
                         newProjectLayout.setResources(imgLocationFieldLP.getText(),
                                 lpLocationField.getText(), assemblyLocationFieldLP.getText());
@@ -403,8 +477,14 @@ public class LoadProjRsrcsDialog {
     }
 
 
-
-
+    /**
+     * Link the browse buttons to their text fields so that the selected file from the file choose that
+     * opens with the browse button goes in the text field.
+     *
+     * @param title         title for the file chooser that's shown with the 'Browse' button
+     * @param button        the 'Browse' button to link
+     * @param textField     the textfield to link
+     */
     private void linkFileButtonToTextField(String title, Button button, TextField textField){
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override

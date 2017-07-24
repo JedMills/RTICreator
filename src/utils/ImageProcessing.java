@@ -8,15 +8,27 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 /**
- * Created by Jed on 16-Jul-17.
+ * Provides methods used for detecting the light angle from the specular balls in the highlight detection projects.
  */
 public class ImageProcessing {
 
+    /**
+     * Converts and image to greyscale.
+     *
+     * @param source        the colourful image
+     * @return              the grey image
+     */
     public static BufferedImage convertToGrayscale(BufferedImage source) {
         BufferedImageOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         return op.filter(source, null);
     }
 
+    /**
+     * The code from this method comes from the original Viewer. Don't really know what it does.
+     *
+     * @param pic       ?
+     * @param pic1      ?
+     */
     public static void blendFilterGray(BufferedImage pic, BufferedImage pic1) {
 
         int Xdim = pic1.getWidth();
@@ -40,6 +52,14 @@ public class ImageProcessing {
         }
     }
 
+
+    /**
+     * Removes all the pixels not within the radius of the center of the ball
+     *
+     * @param source        the source image of the ball
+     * @param circle        the [x, y, r] of the selected circle
+     * @return              the image with pixels cleared from outside the circle
+     */
     static public BufferedImage clearOutside(BufferedImage source, float[] circle) {
         int[] black = {0};
         for (int i = 0; i < source.getWidth(); i++) {
@@ -56,7 +76,14 @@ public class ImageProcessing {
     }
 
 
-
+    /**
+     * Finds the highlight pos in the image and givs it in coordinates for the sub-image of the ball. It does
+     * this by finding  a group of pixels that have colour intensity higher than the threshold value.
+     *
+     * @param img       image to highlight detect
+     * @param th        threshold value for grou pof pixels with intensity above this value
+     * @return          the coordinates of the light spot in the image
+     */
     public static float[] findTh(BufferedImage img, int th) {
         float[] ret = new float[4];
         float[] result = new float[3];
@@ -177,13 +204,20 @@ public class ImageProcessing {
     }
 
 
-
-    public static float[] calculateLightPosition(float[] BallCenter, float[] highlight) {
+    /**
+     * converts the coordinates of the highlight spot on the image of a specular ball to a light direction vector. The
+     * code for this method comes from the original viewer.
+     *
+     * @param ballCenter    [x, y, r] of the ball in the sub-image given
+     * @param highlight     [x, y] position of the highlight spot
+     * @return              the light direction vector for this image
+     */
+    public static float[] calculateLightPosition(float[] ballCenter, float[] highlight) {
 
         float[] lpdir = {0.0f, 0.0f, 0.0f};
 
-        float Sx = (highlight[0] - BallCenter[0]) / BallCenter[2];
-        float Sy = (BallCenter[1] - highlight[1]) / BallCenter[2];
+        float Sx = (highlight[0] - ballCenter[0]) / ballCenter[2];
+        float Sy = (ballCenter[1] - highlight[1]) / ballCenter[2];
         double Sz = Math.sqrt(1.0 - Sx * Sx - Sy * Sy);
 
 

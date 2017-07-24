@@ -296,12 +296,12 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
                     ImageIO.write(jpgImg, "jpg", destination);
                 }catch (IOException e){
                     e.printStackTrace();
-                    success.setB(false);
+                    success.setTrue(false);
                 }
             }
         });
         Main.hideLoadingDialog();
-        if(!success.isB()){
+        if(!success.isTrue()){
             Main.showFileReadingAlert("Error in writing converted jpegs to disk.");
             return null;
         }
@@ -342,7 +342,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
 
         ImageGridTile firstTile = cropExecuteLayout.getLpImagesGrid().getGridTiles()[0];
 
-        if(firstTile.getName().endsWith(".jpg")){areJPEGS.setB(true);}
+        if(firstTile.getName().endsWith(".jpg")){areJPEGS.setTrue(true);}
 
         //crop all the image sin parallel
         final Utils.BooleanHolder success = new Utils.BooleanHolder(true);
@@ -354,7 +354,7 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
                 BufferedImage newImg = Utils.fxImageToBufferedJPEG(croppedImage);
 
                 File destination;
-                if(areJPEGS.isB()) {
+                if(areJPEGS.isTrue()) {
                     destination = new File(croppedFolder.getAbsolutePath() + "/" + tile.getName());
                 }else{
                     destination = new File(croppedFolder.getAbsolutePath() + "/" +
@@ -364,20 +364,19 @@ public class CropExecuteLayoutListener implements EventHandler<ActionEvent> {
                     ImageIO.write(newImg, "jpg", destination);
                 }catch(IOException e){
                     e.printStackTrace();
-                    success.setB(false);
-                    return;
+                    success.setTrue(false);
                 }
             }
         });
         Main.hideLoadingDialog();
-        if(!success.isB()){
+        if(!success.isTrue()){
             Main.showFileReadingAlert("Error in writing cropped files to disk.");
             return null;
         }
 
         //make a new lp file for the images, if the old images were jpegs, we don'tneed to give these
         //ones a new file extension
-        if(areJPEGS.isB()) {
+        if(areJPEGS.isTrue()) {
             return createNewLPFile(croppedFolderLocation, "_cropped.lp",
                     true, null, false);
         }else{
