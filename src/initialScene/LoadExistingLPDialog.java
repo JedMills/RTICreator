@@ -252,6 +252,14 @@ public class LoadExistingLPDialog {
                 return;
             }
 
+            String path = "";
+            for(String imageLoc : lpData.keySet()){
+                path = imageLoc;
+                break;
+            }
+            File firstImgFile = new File(path);
+            Main.currentImagesFolder = firstImgFile.getParentFile();
+
             //if we've succesfully loaded the image, create a grid tile from it and the name in the lp file
             ImageGridTile gridTile = new ImageGridTile(null, imageFile.getName(), image, 150,
                     150, false, true, true);
